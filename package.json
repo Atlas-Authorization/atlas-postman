@@ -1,0 +1,18 @@
+{
+  "name": "atlas-postman",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Postman Collection v2.1 for the Atlas API, generated from the code-derived OpenAPI document.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.15"
+  },
+  "scripts": {
+    "verify": "node verify.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}

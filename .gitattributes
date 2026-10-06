@@ -1,0 +1,3 @@
+*.json linguist-generated=true
+atlas.postman_collection.json linguist-generated=true
+atlas.postman_environment.json linguist-generated=true

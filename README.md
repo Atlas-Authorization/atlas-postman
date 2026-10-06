@@ -11,7 +11,7 @@ drifts from the API.
 | --- | --- |
 | `atlas.postman_collection.json` | The collection — import this into Postman. |
 | `atlas.postman_environment.json` | An environment template — import and fill in your keys. |
-| `verify.mjs` | Structural test (see below). |
+| `verify.ts` | Structural test (TypeScript; see below). |
 
 ## Import into Postman
 
@@ -66,9 +66,11 @@ identical file unless the API actually changed.
 ## Verify
 
 ```bash
-node tools/postman/verify.mjs    # or: pnpm verify:dx
+node tools/postman/verify.ts    # or: pnpm verify:dx  (or, in this repo: npm run verify)
 ```
 
-Asserts the collection is a valid v2.1 document, has the six expected surface folders,
+`verify.ts` is TypeScript and runs directly on Node's native type-stripping
+(Node ≥ 22.15), so no build step or extra dependency is needed. It asserts the
+collection is a valid v2.1 document, has the six expected surface folders,
 is auth-wired correctly, contains a known operation (`POST /v1/users`) with a valid
 JSON body example, and that the environment template carries the key variables.
