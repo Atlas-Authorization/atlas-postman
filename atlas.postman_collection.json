@@ -606,7 +606,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"subject_type\": \"string\",\n  \"subject_id\": \"string\",\n  \"name\": \"string\",\n  \"claims\": {},\n  \"expires_at\": 0,\n  \"scopes\": [\n    \"string\"\n  ],\n  \"constraints\": {},\n  \"max_token_lifetime_seconds\": 0,\n  \"public_key\": \"string\",\n  \"import\": {\n    \"secret_hash\": \"string\",\n    \"hash_algorithm\": \"sha256\",\n    \"prefix\": \"string\",\n    \"created_at\": 0,\n    \"last_used_at\": 0,\n    \"revoked_at\": 0,\n    \"expires_at\": 0\n  }\n}",
+                  "raw": "{\n  \"subject_type\": \"user\",\n  \"subject_id\": \"string\",\n  \"name\": \"string\",\n  \"claims\": {},\n  \"expires_at\": 0,\n  \"scopes\": [\n    \"string\"\n  ],\n  \"constraints\": {},\n  \"max_token_lifetime_seconds\": 0,\n  \"public_key\": \"string\",\n  \"import\": {\n    \"secret_hash\": \"string\",\n    \"hash_algorithm\": \"sha256\",\n    \"prefix\": \"string\",\n    \"created_at\": 0,\n    \"last_used_at\": 0,\n    \"revoked_at\": 0,\n    \"expires_at\": 0\n  }\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -4391,21 +4391,41 @@
               "response": []
             },
             {
-              "name": "GET List machine enrolment tokens (never the secret).",
+              "name": "GET List machine enrolment tokens (never the secret), newest first. Filter by organization and page with a keyset cursor",
               "request": {
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/v1/machine_enrolment_tokens",
+                  "raw": "{{baseUrl}}/v1/machine_enrolment_tokens?organization_id=string&limit=0&starting_after=string",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "v1",
                     "machine_enrolment_tokens"
+                  ],
+                  "query": [
+                    {
+                      "key": "organization_id",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "Restrict to tokens bound to this organization. Pass the literal `null` to list the org-less (instance-wide) pool."
+                    },
+                    {
+                      "key": "limit",
+                      "value": "0",
+                      "disabled": true,
+                      "description": "Page size (1–100; default 50 when a limit is given). Omit entirely to return all tokens unpaged."
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "Cursor: the next_cursor returned by the previous page."
+                    }
                   ]
                 },
-                "description": "List machine enrolment tokens (never the secret).\n**Required scope:** `machines:read`\n\n`GET /v1/machine_enrolment_tokens`"
+                "description": "List machine enrolment tokens (never the secret), newest first. Filter by organization and page with a keyset cursor.\n**Required scope:** `machines:read`\n\n`GET /v1/machine_enrolment_tokens`"
               },
               "response": []
             },
@@ -19134,6 +19154,54 @@
         "type": "noauth"
       },
       "item": [
+        {
+          "name": "apple-app-site-association",
+          "item": [
+            {
+              "name": "GET Apple App Site Association for the instance on this host: the `webcredentials.apps` list (<TeamID>.<bundleId>) that ",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/.well-known/apple-app-site-association",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    ".well-known",
+                    "apple-app-site-association"
+                  ]
+                },
+                "description": "Apple App Site Association for the instance on this host: the `webcredentials.apps` list (<TeamID>.<bundleId>) that lets the tenant's iOS/macOS apps use passkeys registered for this domain. application/json, no redirect. Configured via auth_config.nativeApps.appleAppIds. Unknown host is a 404.\n\n`GET /.well-known/apple-app-site-association`"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "assetlinks.json",
+          "item": [
+            {
+              "name": "GET Android Digital Asset Links for the instance on this host: delegate_permission/common.get_login_creds statements (pa",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/.well-known/assetlinks.json",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    ".well-known",
+                    "assetlinks.json"
+                  ]
+                },
+                "description": "Android Digital Asset Links for the instance on this host: delegate_permission/common.get_login_creds statements (package name + signing-cert SHA-256 fingerprints) that let the tenant's Android apps use passkeys for this domain. Configured via auth_config.nativeApps.androidApps. Unknown host is a 404.\n\n`GET /.well-known/assetlinks.json`"
+              },
+              "response": []
+            }
+          ]
+        },
         {
           "name": "embed.js",
           "item": [
