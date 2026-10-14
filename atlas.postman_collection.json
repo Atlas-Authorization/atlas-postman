@@ -2309,7 +2309,7 @@
               "response": []
             },
             {
-              "name": "POST Claim a custom domain (fapi or accounts). Returns the CNAME instructions to follow.",
+              "name": "POST Claim a custom domain (fapi or accounts). Returns 201 with the full custom_domain object — including its `id` (dom_",
               "request": {
                 "method": "POST",
                 "header": [
@@ -2337,7 +2337,7 @@
                     "domains"
                   ]
                 },
-                "description": "Claim a custom domain (fapi or accounts). Returns the CNAME instructions to follow.\n**Required scope:** `domains:write`\n\n`POST /v1/domains`"
+                "description": "Claim a custom domain (fapi or accounts). Returns 201 with the full custom_domain object — including its `id` (dom_…), which you pass to POST /v1/domains/{id}/verify once DNS is published — plus the CNAME `instructions` to follow (or a `note` for a platform subdomain, which is live immediately).\n**Required scope:** `domains:write`\n\n`POST /v1/domains`"
               },
               "response": []
             }
@@ -3211,6 +3211,26 @@
               "response": []
             },
             {
+              "name": "GET Check your setup in one call. Lists findings about configuration the server can see is broken or worth knowing — no ",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/preflight",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "preflight"
+                  ]
+                },
+                "description": "Check your setup in one call. Lists findings about configuration the server can see is broken or worth knowing — no sign-in method enabled, a social provider enabled without credentials, OAuth clients without redirect or post-logout URIs, custom domains not serving yet, email or SMS sign-in without a provider — each with a severity, a stable code, a plain message and the fix. ok is true when there are no errors. Read-only.\n**Required scope:** `diagnostics:read`\n\n`GET /v1/instance/preflight`"
+              },
+              "response": []
+            },
+            {
               "name": "GET Read instance configuration. Returns both the raw auth_config patch and auth_config_resolved — the EFFECTIVE config ",
               "request": {
                 "method": "GET",
@@ -3246,6 +3266,60 @@
                   ]
                 },
                 "description": "Read the instance kill switches (per-flow on/off) and the customer IP allowlist.\n**Required scope:** `instance:read`\n\n`GET /v1/instance/security`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET Read the instance's sign-in page design: stored overrides, the resolved design, contrast warnings and the legacy fla",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/design",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "design"
+                  ]
+                },
+                "description": "Read the instance's sign-in page design: stored overrides, the resolved design, contrast warnings and the legacy flag.\n**Required scope:** `instance:read`\n\n`GET /v1/instance/design`"
+              },
+              "response": []
+            },
+            {
+              "name": "PATCH Change part of the instance design ({ design: AtlasDesignPatch }): nested settings merge, null removes a setting.",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"design\": {\n    \"version\": \"string\",\n    \"preset\": \"minimal\",\n    \"colorScheme\": \"auto\",\n    \"palette\": {\n      \"primary\": \"string\",\n      \"primaryInk\": \"string\",\n      \"accent\": \"string\",\n      \"background\": \"string\",\n      \"surface\": \"string\",\n      \"text\": \"string\",\n      \"muted\": \"string\",\n      \"border\": \"string\",\n      \"danger\": \"string\",\n      \"success\": \"string\",\n      \"inputBackground\": \"string\",\n      \"inputText\": \"string\"\n    },\n    \"paletteDark\": {\n      \"primary\": \"string\",\n      \"primaryInk\": \"string\",\n      \"accent\": \"string\",\n      \"background\": \"string\",\n      \"surface\": \"string\",\n      \"text\": \"string\",\n      \"muted\": \"string\",\n      \"border\": \"string\",\n      \"danger\": \"string\",\n      \"success\": \"string\",\n      \"inputBackground\": \"string\",\n      \"inputText\": \"string\"\n    },\n    \"typography\": {\n      \"font\": \"system\",\n      \"headingFont\": \"system\",\n      \"baseSize\": 0,\n      \"headingWeight\": 0,\n      \"bodyWeight\": 0,\n      \"letterCase\": \"none\",\n      \"scale\": \"minor-second\"\n    },\n    \"shape\": {\n      \"radius\": 0,\n      \"controlRadius\": 0,\n      \"borderWidth\": 0\n    },\n    \"elevation\": {\n      \"cardShadow\": \"none\"\n    },\n    \"spacing\": {\n      \"density\": \"compact\"\n    },\n    \"card\": {\n      \"style\": \"solid\",\n      \"blur\": 0,\n      \"width\": \"narrow\"\n    },\n    \"layout\": {\n      \"position\": \"center\",\n      \"splitImageSide\": \"left\",\n      \"logoPlacement\": \"card\",\n      \"logoSize\": \"sm\"\n    },\n    \"buttons\": {\n      \"style\": \"solid\",\n      \"socialLayout\": \"list\"\n    },\n    \"inputs\": {\n      \"style\": \"outline\"\n    },\n    \"background\": {\n      \"color\": \"string\",\n      \"gradient\": {\n        \"type\": \"linear\",\n        \"angle\": 0,\n        \"stops\": [\n          {\n            \"color\": null,\n            \"at\": null\n          }\n        ]\n      },\n      \"image\": {\n        \"assetId\": \"string\",\n        \"fit\": \"cover\",\n        \"position\": \"top-left\",\n        \"overlay\": {\n          \"color\": \"string\",\n          \"opacity\": 0\n        },\n        \"blur\": 0\n      },\n      \"pattern\": \"none\"\n    },\n    \"backgroundDark\": {\n      \"color\": \"string\",\n      \"gradient\": {\n        \"type\": \"linear\",\n        \"angle\": 0,\n        \"stops\": [\n          {\n            \"color\": null,\n            \"at\": null\n          }\n        ]\n      },\n      \"image\": {\n        \"assetId\": \"string\",\n        \"fit\": \"cover\",\n        \"position\": \"top-left\",\n        \"overlay\": {\n          \"color\": \"string\",\n          \"opacity\": 0\n        },\n        \"blur\": 0\n      },\n      \"pattern\": \"none\"\n    },\n    \"logo\": {\n      \"assetId\": \"string\",\n      \"darkAssetId\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/design",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "design"
+                  ]
+                },
+                "description": "Change part of the instance design ({ design: AtlasDesignPatch }): nested settings merge, null removes a setting.\n**Required scope:** `instance:write`\n\n`PATCH /v1/instance/design`"
               },
               "response": []
             },
@@ -3312,7 +3386,76 @@
                     "instance"
                   ]
                 },
-                "description": "Update allowed origins and auth_config (a partial, validated, merged patch — not a replace). Wildcard origins refused; an invalid auth_config returns 422. The response echoes auth_config_resolved so you can confirm the change took effect.\n**Required scope:** `instance:write`\n\n`PATCH /v1/instance`"
+                "description": "Update allowed origins and auth_config (a partial, validated, merged patch — not a replace). Wildcard origins refused; an invalid auth_config returns 422. Turning email code or email link sign-in ON while the instance cannot deliver email (a production instance with no email provider) returns 422 EMAIL_PROVIDER_REQUIRED naming the field; configure one first with PUT /v1/messaging_providers/email. Methods that are already on are left alone. The response echoes auth_config_resolved so you can confirm the change took effect.\n**Required scope:** `instance:write`\n\n`PATCH /v1/instance`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Compile an unsaved design: CSS variables scoped to .atlas-root, data attributes, font stylesheet URLs, warnings, th",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"design\": {\n    \"version\": \"string\",\n    \"preset\": \"minimal\",\n    \"colorScheme\": \"auto\",\n    \"palette\": {\n      \"primary\": \"string\",\n      \"primaryInk\": \"string\",\n      \"accent\": \"string\",\n      \"background\": \"string\",\n      \"surface\": \"string\",\n      \"text\": \"string\",\n      \"muted\": \"string\",\n      \"border\": \"string\",\n      \"danger\": \"string\",\n      \"success\": \"string\",\n      \"inputBackground\": \"string\",\n      \"inputText\": \"string\"\n    },\n    \"paletteDark\": {\n      \"primary\": \"string\",\n      \"primaryInk\": \"string\",\n      \"accent\": \"string\",\n      \"background\": \"string\",\n      \"surface\": \"string\",\n      \"text\": \"string\",\n      \"muted\": \"string\",\n      \"border\": \"string\",\n      \"danger\": \"string\",\n      \"success\": \"string\",\n      \"inputBackground\": \"string\",\n      \"inputText\": \"string\"\n    },\n    \"typography\": {\n      \"font\": \"system\",\n      \"headingFont\": \"system\",\n      \"baseSize\": 0,\n      \"headingWeight\": 0,\n      \"bodyWeight\": 0,\n      \"letterCase\": \"none\",\n      \"scale\": \"minor-second\"\n    },\n    \"shape\": {\n      \"radius\": 0,\n      \"controlRadius\": 0,\n      \"borderWidth\": 0\n    },\n    \"elevation\": {\n      \"cardShadow\": \"none\"\n    },\n    \"spacing\": {\n      \"density\": \"compact\"\n    },\n    \"card\": {\n      \"style\": \"solid\",\n      \"blur\": 0,\n      \"width\": \"narrow\"\n    },\n    \"layout\": {\n      \"position\": \"center\",\n      \"splitImageSide\": \"left\",\n      \"logoPlacement\": \"card\",\n      \"logoSize\": \"sm\"\n    },\n    \"buttons\": {\n      \"style\": \"solid\",\n      \"socialLayout\": \"list\"\n    },\n    \"inputs\": {\n      \"style\": \"outline\"\n    },\n    \"background\": {\n      \"color\": \"string\",\n      \"gradient\": {\n        \"type\": \"linear\",\n        \"angle\": 0,\n        \"stops\": [\n          {\n            \"color\": null,\n            \"at\": null\n          }\n        ]\n      },\n      \"image\": {\n        \"assetId\": \"string\",\n        \"fit\": \"cover\",\n        \"position\": \"top-left\",\n        \"overlay\": {\n          \"color\": \"string\",\n          \"opacity\": 0\n        },\n        \"blur\": 0\n      },\n      \"pattern\": \"none\"\n    },\n    \"backgroundDark\": {\n      \"color\": \"string\",\n      \"gradient\": {\n        \"type\": \"linear\",\n        \"angle\": 0,\n        \"stops\": [\n          {\n            \"color\": null,\n            \"at\": null\n          }\n        ]\n      },\n      \"image\": {\n        \"assetId\": \"string\",\n        \"fit\": \"cover\",\n        \"position\": \"top-left\",\n        \"overlay\": {\n          \"color\": \"string\",\n          \"opacity\": 0\n        },\n        \"blur\": 0\n      },\n      \"pattern\": \"none\"\n    },\n    \"logo\": {\n      \"assetId\": \"string\",\n      \"darkAssetId\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/design/preview",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "design",
+                    "preview"
+                  ]
+                },
+                "description": "Compile an unsaved design: CSS variables scoped to .atlas-root, data attributes, font stylesheet URLs, warnings, the resolved design and the rendered sign-in page. Nothing is saved.\n**Required scope:** `instance:read`\n\n`POST /v1/instance/design/preview`"
+              },
+              "response": []
+            },
+            {
+              "name": "PUT Replace the instance design ({ design: AtlasDesign }). Unknown keys are refused with their path; image ids must be d",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"design\": {\n    \"version\": \"string\",\n    \"preset\": \"minimal\",\n    \"colorScheme\": \"auto\",\n    \"palette\": {\n      \"primary\": \"string\",\n      \"primaryInk\": \"string\",\n      \"accent\": \"string\",\n      \"background\": \"string\",\n      \"surface\": \"string\",\n      \"text\": \"string\",\n      \"muted\": \"string\",\n      \"border\": \"string\",\n      \"danger\": \"string\",\n      \"success\": \"string\",\n      \"inputBackground\": \"string\",\n      \"inputText\": \"string\"\n    },\n    \"paletteDark\": {\n      \"primary\": \"string\",\n      \"primaryInk\": \"string\",\n      \"accent\": \"string\",\n      \"background\": \"string\",\n      \"surface\": \"string\",\n      \"text\": \"string\",\n      \"muted\": \"string\",\n      \"border\": \"string\",\n      \"danger\": \"string\",\n      \"success\": \"string\",\n      \"inputBackground\": \"string\",\n      \"inputText\": \"string\"\n    },\n    \"typography\": {\n      \"font\": \"system\",\n      \"headingFont\": \"system\",\n      \"baseSize\": 0,\n      \"headingWeight\": 0,\n      \"bodyWeight\": 0,\n      \"letterCase\": \"none\",\n      \"scale\": \"minor-second\"\n    },\n    \"shape\": {\n      \"radius\": 0,\n      \"controlRadius\": 0,\n      \"borderWidth\": 0\n    },\n    \"elevation\": {\n      \"cardShadow\": \"none\"\n    },\n    \"spacing\": {\n      \"density\": \"compact\"\n    },\n    \"card\": {\n      \"style\": \"solid\",\n      \"blur\": 0,\n      \"width\": \"narrow\"\n    },\n    \"layout\": {\n      \"position\": \"center\",\n      \"splitImageSide\": \"left\",\n      \"logoPlacement\": \"card\",\n      \"logoSize\": \"sm\"\n    },\n    \"buttons\": {\n      \"style\": \"solid\",\n      \"socialLayout\": \"list\"\n    },\n    \"inputs\": {\n      \"style\": \"outline\"\n    },\n    \"background\": {\n      \"color\": \"string\",\n      \"gradient\": {\n        \"type\": \"linear\",\n        \"angle\": 0,\n        \"stops\": [\n          {\n            \"color\": null,\n            \"at\": null\n          }\n        ]\n      },\n      \"image\": {\n        \"assetId\": \"string\",\n        \"fit\": \"cover\",\n        \"position\": \"top-left\",\n        \"overlay\": {\n          \"color\": \"string\",\n          \"opacity\": 0\n        },\n        \"blur\": 0\n      },\n      \"pattern\": \"none\"\n    },\n    \"backgroundDark\": {\n      \"color\": \"string\",\n      \"gradient\": {\n        \"type\": \"linear\",\n        \"angle\": 0,\n        \"stops\": [\n          {\n            \"color\": null,\n            \"at\": null\n          }\n        ]\n      },\n      \"image\": {\n        \"assetId\": \"string\",\n        \"fit\": \"cover\",\n        \"position\": \"top-left\",\n        \"overlay\": {\n          \"color\": \"string\",\n          \"opacity\": 0\n        },\n        \"blur\": 0\n      },\n      \"pattern\": \"none\"\n    },\n    \"logo\": {\n      \"assetId\": \"string\",\n      \"darkAssetId\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/design",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "design"
+                  ]
+                },
+                "description": "Replace the instance design ({ design: AtlasDesign }). Unknown keys are refused with their path; image ids must be design assets uploaded to this instance.\n**Required scope:** `instance:write`\n\n`PUT /v1/instance/design`"
               },
               "response": []
             },
@@ -5022,6 +5165,82 @@
           ]
         },
         {
+          "name": "mcp_connector",
+          "item": [
+            {
+              "name": "DELETE Disable the remote MCP connector. Stored preferences (name, scopes, hosts) are kept so a later re-enable restores",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/mcp_connector",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "mcp_connector"
+                  ]
+                },
+                "description": "Disable the remote MCP connector. Stored preferences (name, scopes, hosts) are kept so a later re-enable restores them; existing OAuth access tokens stop working immediately.\n**Required scope:** `mcp_connector:write`\n\n`DELETE /v1/mcp_connector`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET Read the instance's remote MCP connector: enabled state, exposed tool scopes, dynamic-registration policy, plus the ",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/mcp_connector",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "mcp_connector"
+                  ]
+                },
+                "description": "Read the instance's remote MCP connector: enabled state, exposed tool scopes, dynamic-registration policy, plus the computed discovery URL, resource identifier and whether the resource server exists.\n**Required scope:** `mcp_connector:read`\n\n`GET /v1/mcp_connector`"
+              },
+              "response": []
+            },
+            {
+              "name": "PUT Configure the remote MCP connector (enabled, name, exposed_scopes, dynamic_registration, allowed_redirect_hosts). On",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"enabled\": false,\n  \"name\": \"string\",\n  \"exposed_scopes\": [\n    \"profile\"\n  ],\n  \"dynamic_registration\": false,\n  \"allowed_redirect_hosts\": [\n    \"string\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/mcp_connector",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "mcp_connector"
+                  ]
+                },
+                "description": "Configure the remote MCP connector (enabled, name, exposed_scopes, dynamic_registration, allowed_redirect_hosts). Only the fields you send change. Enabling provisions the MCP resource server and requires a frontend API host; an unknown scope is a 422.\n**Required scope:** `mcp_connector:write`\n\n`PUT /v1/mcp_connector`"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
           "name": "messaging_providers",
           "item": [
             {
@@ -5111,7 +5330,7 @@
               "response": []
             },
             {
-              "name": "PUT Configure the email delivery provider (Resend/SES/SMTP/Brevo/Mailgun). The provider secret is write-only; an omitted",
+              "name": "PUT Configure the email delivery provider. The body is discriminated by `transport` (resend, ses, smtp, brevo, mailgun);",
               "request": {
                 "method": "PUT",
                 "header": [
@@ -5122,7 +5341,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"transport\": \"string\",\n  \"from_address\": \"string\",\n  \"config\": {}\n}",
+                  "raw": "{\n  \"transport\": \"string\",\n  \"from_address\": \"string\",\n  \"config\": {\n    \"api_key\": \"string\"\n  }\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -5140,12 +5359,12 @@
                     "email"
                   ]
                 },
-                "description": "Configure the email delivery provider (Resend/SES/SMTP/Brevo/Mailgun). The provider secret is write-only; an omitted secret keeps the stored one.\n**Required scope:** `messaging:write`\n\n`PUT /v1/messaging_providers/email`"
+                "description": "Configure the email delivery provider. The body is discriminated by `transport` (resend, ses, smtp, brevo, mailgun); each transport has its own `config` keys, listed in its schema. Unknown or missing keys are refused with a 422 naming `config.<key>`. Secrets are write-only; on an update of the same transport an omitted secret keeps the stored one.\n**Required scope:** `messaging:write`\n\n`PUT /v1/messaging_providers/email`"
               },
               "response": []
             },
             {
-              "name": "PUT Configure the SMS delivery provider (Twilio). The auth token is write-only.",
+              "name": "PUT Configure the SMS delivery provider. The body is discriminated by `transport` (twilio, vonage, messagebird, plivo, t",
               "request": {
                 "method": "PUT",
                 "header": [
@@ -5156,7 +5375,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"transport\": \"string\",\n  \"from_address\": \"string\",\n  \"config\": {}\n}",
+                  "raw": "{\n  \"transport\": \"string\",\n  \"from_address\": \"string\",\n  \"config\": {\n    \"account_sid\": \"string\",\n    \"auth_token\": \"string\",\n    \"from\": \"string\",\n    \"whatsapp_from\": \"string\",\n    \"voice_from\": \"string\"\n  }\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -5174,7 +5393,7 @@
                     "sms"
                   ]
                 },
-                "description": "Configure the SMS delivery provider (Twilio). The auth token is write-only.\n**Required scope:** `messaging:write`\n\n`PUT /v1/messaging_providers/sms`"
+                "description": "Configure the SMS delivery provider. The body is discriminated by `transport` (twilio, vonage, messagebird, plivo, telnyx, sinch, infobip, clicksend, bandwidth, aws_sns); each transport has its own `config` keys. Unknown or missing keys are refused with a 422 naming `config.<key>`. Secrets are write-only.\n**Required scope:** `messaging:write`\n\n`PUT /v1/messaging_providers/sms`"
               },
               "response": []
             }
@@ -6010,16 +6229,30 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/v1/oauth_providers",
+                  "raw": "{{baseUrl}}/v1/oauth_providers?provider=&configured=false",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "v1",
                     "oauth_providers"
+                  ],
+                  "query": [
+                    {
+                      "key": "provider",
+                      "value": "",
+                      "disabled": true,
+                      "description": "Only these catalogue keys (exact match, e.g. `google`). Repeat the parameter or comma-separate values (`provider=google,github`). An unknown key is a 400."
+                    },
+                    {
+                      "key": "configured",
+                      "value": "false",
+                      "disabled": true,
+                      "description": "Filter on the `configured` field: `true` = a client_id is stored for this instance, `false` = not set up. Independent of `enabled` (a configured provider may still be switched off)."
+                    }
                   ]
                 },
-                "description": "List the social sign-in provider catalog with which are configured/enabled and each derived redirect URI. Never returns a client secret.\n**Required scope:** `oauth_providers:read`\n\n`GET /v1/oauth_providers`"
+                "description": "List the social sign-in provider catalog with which are configured/enabled and each derived redirect URI. Never returns a client secret. Narrow it with `provider` and/or `configured`; other query parameters are ignored.\n**Required scope:** `oauth_providers:read`\n\n`GET /v1/oauth_providers`"
               },
               "response": []
             },
@@ -6168,7 +6401,7 @@
                     }
                   ]
                 },
-                "description": "Set a social sign-in provider's client id/secret (and scopes/settings). The secret is write-only and stored encrypted; pasting your own clears the shared-dev-keys flag. Does NOT enable the provider — use POST /v1/oauth_providers/{provider}/enabled for that. Accepts display-only fields with no credentials: display_name, icon_url, and mode ('native'|'redirect', to force a native provider like Google through the redirect flow; \"\" clears the override).\n**Required scope:** `oauth_providers:write`\n\n`PUT /v1/oauth_providers/{provider}`"
+                "description": "Set a social sign-in provider's client id/secret (and scopes/settings). The secret is write-only and stored encrypted. If the instance was using Atlas's shared development credentials for this provider (a dashboard option on development instances), saving your own replaces them. Does NOT enable the provider — use POST /v1/oauth_providers/{provider}/enabled for that. Accepts display-only fields with no credentials: display_name, icon_url, and mode ('native'|'redirect', to force a native provider like Google through the redirect flow; \"\" clears the override).\n**Required scope:** `oauth_providers:write`\n\n`PUT /v1/oauth_providers/{provider}`"
               },
               "response": []
             }
@@ -7352,6 +7585,33 @@
               "response": []
             },
             {
+              "name": "GET Read an organization's design override and the result of layering it over the instance design.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/organizations/:id/design",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "organizations",
+                    ":id",
+                    "design"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Read an organization's design override and the result of layering it over the instance design.\n**Required scope:** `organizations:read`\n\n`GET /v1/organizations/{id}/design`"
+              },
+              "response": []
+            },
+            {
               "name": "GET Read an organization's hosted-page branding overlay (display name, logo, primary colour, support URL, custom domain)",
               "request": {
                 "method": "GET",
@@ -7521,6 +7781,88 @@
                   ]
                 },
                 "description": "Change a member's role. Demoting the last admin returns LAST_ADMIN.\n**Required scope:** `organizations:write`\n\n`PATCH /v1/organizations/{id}/memberships/{userId}`"
+              },
+              "response": []
+            },
+            {
+              "name": "PATCH Change part of an organization's design override; null removes a setting.",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"design\": {\n    \"version\": \"string\",\n    \"preset\": \"minimal\",\n    \"colorScheme\": \"auto\",\n    \"palette\": {\n      \"primary\": \"string\",\n      \"primaryInk\": \"string\",\n      \"accent\": \"string\",\n      \"background\": \"string\",\n      \"surface\": \"string\",\n      \"text\": \"string\",\n      \"muted\": \"string\",\n      \"border\": \"string\",\n      \"danger\": \"string\",\n      \"success\": \"string\",\n      \"inputBackground\": \"string\",\n      \"inputText\": \"string\"\n    },\n    \"paletteDark\": {\n      \"primary\": \"string\",\n      \"primaryInk\": \"string\",\n      \"accent\": \"string\",\n      \"background\": \"string\",\n      \"surface\": \"string\",\n      \"text\": \"string\",\n      \"muted\": \"string\",\n      \"border\": \"string\",\n      \"danger\": \"string\",\n      \"success\": \"string\",\n      \"inputBackground\": \"string\",\n      \"inputText\": \"string\"\n    },\n    \"typography\": {\n      \"font\": \"system\",\n      \"headingFont\": \"system\",\n      \"baseSize\": 0,\n      \"headingWeight\": 0,\n      \"bodyWeight\": 0,\n      \"letterCase\": \"none\",\n      \"scale\": \"minor-second\"\n    },\n    \"shape\": {\n      \"radius\": 0,\n      \"controlRadius\": 0,\n      \"borderWidth\": 0\n    },\n    \"elevation\": {\n      \"cardShadow\": \"none\"\n    },\n    \"spacing\": {\n      \"density\": \"compact\"\n    },\n    \"card\": {\n      \"style\": \"solid\",\n      \"blur\": 0,\n      \"width\": \"narrow\"\n    },\n    \"layout\": {\n      \"position\": \"center\",\n      \"splitImageSide\": \"left\",\n      \"logoPlacement\": \"card\",\n      \"logoSize\": \"sm\"\n    },\n    \"buttons\": {\n      \"style\": \"solid\",\n      \"socialLayout\": \"list\"\n    },\n    \"inputs\": {\n      \"style\": \"outline\"\n    },\n    \"background\": {\n      \"color\": \"string\",\n      \"gradient\": {\n        \"type\": \"linear\",\n        \"angle\": 0,\n        \"stops\": [\n          {\n            \"color\": null,\n            \"at\": null\n          }\n        ]\n      },\n      \"image\": {\n        \"assetId\": \"string\",\n        \"fit\": \"cover\",\n        \"position\": \"top-left\",\n        \"overlay\": {\n          \"color\": \"string\",\n          \"opacity\": 0\n        },\n        \"blur\": 0\n      },\n      \"pattern\": \"none\"\n    },\n    \"backgroundDark\": {\n      \"color\": \"string\",\n      \"gradient\": {\n        \"type\": \"linear\",\n        \"angle\": 0,\n        \"stops\": [\n          {\n            \"color\": null,\n            \"at\": null\n          }\n        ]\n      },\n      \"image\": {\n        \"assetId\": \"string\",\n        \"fit\": \"cover\",\n        \"position\": \"top-left\",\n        \"overlay\": {\n          \"color\": \"string\",\n          \"opacity\": 0\n        },\n        \"blur\": 0\n      },\n      \"pattern\": \"none\"\n    },\n    \"logo\": {\n      \"assetId\": \"string\",\n      \"darkAssetId\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/organizations/:id/design",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "organizations",
+                    ":id",
+                    "design"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Change part of an organization's design override; null removes a setting.\n**Required scope:** `organizations:write`\n\n`PATCH /v1/organizations/{id}/design`"
+              },
+              "response": []
+            },
+            {
+              "name": "PATCH Merge a partial object into an organization's settings values (RFC 7396 shallow merge): a key set to null is REMOV",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"values\": {}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/organizations/:id/settings",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "organizations",
+                    ":id",
+                    "settings"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Merge a partial object into an organization's settings values (RFC 7396 shallow merge): a key set to null is REMOVED, any other value sets/overwrites it, untouched keys are preserved — so a single settings key can be removed or changed without read-replacing the whole document. The merge is row-locked (atomic against concurrent writers); the MERGED result is validated against the registered schema (422 SETTINGS_INVALID — e.g. removing a required key), then versioned, audited, and emitted as organization.settings.updated.\n**Required scope:** `organizations:write`\n\n`PATCH /v1/organizations/{id}/settings`"
               },
               "response": []
             },
@@ -7989,6 +8331,47 @@
               "response": []
             },
             {
+              "name": "PUT Replace an organization's design override ({ design: AtlasDesign }); { design: {} } removes it. Image ids must be de",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"design\": {\n    \"version\": \"string\",\n    \"preset\": \"minimal\",\n    \"colorScheme\": \"auto\",\n    \"palette\": {\n      \"primary\": \"string\",\n      \"primaryInk\": \"string\",\n      \"accent\": \"string\",\n      \"background\": \"string\",\n      \"surface\": \"string\",\n      \"text\": \"string\",\n      \"muted\": \"string\",\n      \"border\": \"string\",\n      \"danger\": \"string\",\n      \"success\": \"string\",\n      \"inputBackground\": \"string\",\n      \"inputText\": \"string\"\n    },\n    \"paletteDark\": {\n      \"primary\": \"string\",\n      \"primaryInk\": \"string\",\n      \"accent\": \"string\",\n      \"background\": \"string\",\n      \"surface\": \"string\",\n      \"text\": \"string\",\n      \"muted\": \"string\",\n      \"border\": \"string\",\n      \"danger\": \"string\",\n      \"success\": \"string\",\n      \"inputBackground\": \"string\",\n      \"inputText\": \"string\"\n    },\n    \"typography\": {\n      \"font\": \"system\",\n      \"headingFont\": \"system\",\n      \"baseSize\": 0,\n      \"headingWeight\": 0,\n      \"bodyWeight\": 0,\n      \"letterCase\": \"none\",\n      \"scale\": \"minor-second\"\n    },\n    \"shape\": {\n      \"radius\": 0,\n      \"controlRadius\": 0,\n      \"borderWidth\": 0\n    },\n    \"elevation\": {\n      \"cardShadow\": \"none\"\n    },\n    \"spacing\": {\n      \"density\": \"compact\"\n    },\n    \"card\": {\n      \"style\": \"solid\",\n      \"blur\": 0,\n      \"width\": \"narrow\"\n    },\n    \"layout\": {\n      \"position\": \"center\",\n      \"splitImageSide\": \"left\",\n      \"logoPlacement\": \"card\",\n      \"logoSize\": \"sm\"\n    },\n    \"buttons\": {\n      \"style\": \"solid\",\n      \"socialLayout\": \"list\"\n    },\n    \"inputs\": {\n      \"style\": \"outline\"\n    },\n    \"background\": {\n      \"color\": \"string\",\n      \"gradient\": {\n        \"type\": \"linear\",\n        \"angle\": 0,\n        \"stops\": [\n          {\n            \"color\": null,\n            \"at\": null\n          }\n        ]\n      },\n      \"image\": {\n        \"assetId\": \"string\",\n        \"fit\": \"cover\",\n        \"position\": \"top-left\",\n        \"overlay\": {\n          \"color\": \"string\",\n          \"opacity\": 0\n        },\n        \"blur\": 0\n      },\n      \"pattern\": \"none\"\n    },\n    \"backgroundDark\": {\n      \"color\": \"string\",\n      \"gradient\": {\n        \"type\": \"linear\",\n        \"angle\": 0,\n        \"stops\": [\n          {\n            \"color\": null,\n            \"at\": null\n          }\n        ]\n      },\n      \"image\": {\n        \"assetId\": \"string\",\n        \"fit\": \"cover\",\n        \"position\": \"top-left\",\n        \"overlay\": {\n          \"color\": \"string\",\n          \"opacity\": 0\n        },\n        \"blur\": 0\n      },\n      \"pattern\": \"none\"\n    },\n    \"logo\": {\n      \"assetId\": \"string\",\n      \"darkAssetId\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/organizations/:id/design",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "organizations",
+                    ":id",
+                    "design"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Replace an organization's design override ({ design: AtlasDesign }); { design: {} } removes it. Image ids must be design assets uploaded to this instance.\n**Required scope:** `organizations:write`\n\n`PUT /v1/organizations/{id}/design`"
+              },
+              "response": []
+            },
+            {
               "name": "PUT Replace the organization public and private metadata bags wholesale.",
               "request": {
                 "method": "PUT",
@@ -8149,6 +8532,195 @@
                   ]
                 },
                 "description": "Write one organization's settings values. Validated against the registered schema (422 SETTINGS_INVALID with failing paths on mismatch); versions, audits, and emits organization.settings.updated.\n**Required scope:** `organizations:write`\n\n`PUT /v1/organizations/{id}/settings`"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "pca",
+          "item": [
+            {
+              "name": "DELETE Clear the instance-wide PCA kill switch.",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/freeze",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "freeze"
+                  ]
+                },
+                "description": "Clear the instance-wide PCA kill switch.\n**Required scope:** `pca:write`\n\n`DELETE /v1/pca/freeze`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET The instance's trusted software-attestor public keys.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/attestors",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "attestors"
+                  ]
+                },
+                "description": "The instance's trusted software-attestor public keys.\n**Required scope:** `pca:read`\n\n`GET /v1/pca/attestors`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Deny a pending step-up: the held action is never anchored. Audited.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/stepups/:id/deny",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "stepups",
+                    ":id",
+                    "deny"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Deny a pending step-up: the held action is never anchored. Audited.\n**Required scope:** `pca:write`\n\n`POST /v1/pca/stepups/{id}/deny`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Engage the instance-wide PCA kill switch: every PCActn is denied until it is cleared.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/freeze",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "freeze"
+                  ]
+                },
+                "description": "Engage the instance-wide PCA kill switch: every PCActn is denied until it is cleared.\n**Required scope:** `pca:write`\n\n`POST /v1/pca/freeze`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Revoke a capability id under a grant; any PCActn whose chain contains it is denied. Revoking the grant_ref itself r",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"grant_ref\": \"string\",\n  \"cap_id\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/revocations",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "revocations"
+                  ]
+                },
+                "description": "Revoke a capability id under a grant; any PCActn whose chain contains it is denied. Revoking the grant_ref itself revokes the whole grant.\n**Required scope:** `pca:write`\n\n`POST /v1/pca/revocations`"
+              },
+              "response": []
+            },
+            {
+              "name": "PUT Replace the trusted software-attestor key list. When non-empty, a PCActn that presents an attestation is verified ag",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"trusted_attestor_keys\": [\n    \"string\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/attestors",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "attestors"
+                  ]
+                },
+                "description": "Replace the trusted software-attestor key list. When non-empty, a PCActn that presents an attestation is verified against these keys (enforced); empty leaves attestation not-enforced. Audited.\n**Required scope:** `pca:write`\n\n`PUT /v1/pca/attestors`"
               },
               "response": []
             }
@@ -9567,7 +10139,7 @@
               "response": []
             },
             {
-              "name": "POST Revoke one session, signing that device out.",
+              "name": "POST Revoke one session, signing that device out. OIDC apps signed in through it are sent a back-channel logout.",
               "request": {
                 "method": "POST",
                 "header": [],
@@ -9589,7 +10161,7 @@
                     }
                   ]
                 },
-                "description": "Revoke one session, signing that device out.\n**Required scope:** `sessions:write`\n\n`POST /v1/sessions/{id}/revoke`"
+                "description": "Revoke one session, signing that device out. OIDC apps signed in through it are sent a back-channel logout.\n**Required scope:** `sessions:write`\n\n`POST /v1/sessions/{id}/revoke`"
               },
               "response": []
             }
@@ -10774,6 +11346,47 @@
                   ]
                 },
                 "description": "Unlink a provider identity, extracting it into a new standalone user (Auth0 semantics). The sole/primary identity cannot be unlinked.\n**Required scope:** `users:write`\n\n`DELETE /v1/users/{id}/identities/{identityId}`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET A user's successful sign-ins, newest first, keyset-paginated. Each entry carries the method, provider (for social lo",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/users/:id/sign_in_history?limit=0&starting_after=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "users",
+                    ":id",
+                    "sign_in_history"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "0",
+                      "disabled": true,
+                      "description": "Page size (1–100; default 50)."
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "Cursor: the next_cursor from the previous page."
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "A user's successful sign-ins, newest first, keyset-paginated. Each entry carries the method, provider (for social logins), the IP it came from, any impersonator, and the time. `limit` (1–100, default 50) + `starting_after` (the previous page's next_cursor) page it; the response carries has_more + next_cursor.\n**Required scope:** `users:read`\n\n`GET /v1/users/{id}/sign_in_history`"
               },
               "response": []
             },
@@ -12614,7 +13227,7 @@
                     "appearance"
                   ]
                 },
-                "description": "The embeddable widget's public theme + enabled providers/strategies, resolved by publishable key or host. Public only — no secrets, no customCss/customHtml.\n\n`GET /v1/appearance`"
+                "description": "The embeddable widget's public theme + enabled providers/strategies, resolved by publishable key or host. Public only — no secrets, no customCss/customHtml. `design` carries the instance design (with the active org's override) compiled for SDK components: CSS custom properties scoped to `.atlas-root`, the data attributes to set on that element, absolute font stylesheet URLs and the resolved design; null until a design has been saved.\n\n`GET /v1/appearance`"
               },
               "response": []
             }
@@ -12901,6 +13514,90 @@
                   ]
                 },
                 "description": "§5 \"captcha anywhere\": verify a CAPTCHA token from the browser against the instance's centrally-configured provider for an optional `action`. Fails CLOSED like login. No provider reason-codes (`meta`) cross to the browser — only success + score.\n\n`POST /v1/client/captcha/verify`"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "design",
+          "item": [
+            {
+              "name": "GET A self-hosted web-font stylesheet for a curated font (e.g. inter.css): only @font-face rules pointing at font files ",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/design/fonts/:sheet",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "design",
+                    "fonts",
+                    ":sheet"
+                  ],
+                  "variable": [
+                    {
+                      "key": "sheet",
+                      "value": "sheet"
+                    }
+                  ]
+                },
+                "description": "A self-hosted web-font stylesheet for a curated font (e.g. inter.css): only @font-face rules pointing at font files on this origin. Fonts are never hot-linked from a third party.\n\n`GET /v1/design/fonts/{sheet}`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET A self-hosted woff2 font file (content-hash name), cacheable for a year.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/design/fonts/:fontId/:file",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "design",
+                    "fonts",
+                    ":fontId",
+                    ":file"
+                  ],
+                  "variable": [
+                    {
+                      "key": "fontId",
+                      "value": "fontId"
+                    },
+                    {
+                      "key": "file",
+                      "value": "file"
+                    }
+                  ]
+                },
+                "description": "A self-hosted woff2 font file (content-hash name), cacheable for a year.\n\n`GET /v1/design/fonts/{fontId}/{file}`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET The design-system catalog: the sign-in page presets (each fully resolved), the curated font list, and the documented",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/design/catalog",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "design",
+                    "catalog"
+                  ]
+                },
+                "description": "The design-system catalog: the sign-in page presets (each fully resolved), the curated font list, and the documented --atlas-* CSS variable set. Public and cacheable.\n\n`GET /v1/design/catalog`"
               },
               "response": []
             }
@@ -13358,7 +14055,7 @@
                     "mcp"
                   ]
                 },
-                "description": "Discover the user-scoped MCP tools your personal access token can use, plus the recommended scope set for an account-management agent.\n\n`GET /v1/client/me/mcp`"
+                "description": "Discover the user-scoped MCP tools your personal access token can use, plus the recommended scope set for an account-management agent. Also accepts an OAuth access token issued for the remote MCP connector; a missing or invalid credential is a 401 with a `WWW-Authenticate: Bearer resource_metadata=...` challenge.\n\n`GET /v1/client/me/mcp`"
               },
               "response": []
             },
@@ -14376,7 +15073,7 @@
                     "mcp"
                   ]
                 },
-                "description": "JSON-RPC MCP endpoint: manage your own account as MCP tools (read/update profile, list sessions, revoke-all, list factors and more), authenticated by a personal access token.\n\n`POST /v1/client/me/mcp`"
+                "description": "JSON-RPC MCP endpoint: manage your own account as MCP tools (read/update profile, list sessions, revoke-all, list factors and more), authenticated by a personal access token, a session token, or an OAuth access token (remote MCP connector). Notifications such as notifications/initialized are acknowledged with 202.\n\n`POST /v1/client/me/mcp`"
               },
               "response": []
             },
@@ -15563,7 +16260,7 @@
           "name": "password_resets",
           "item": [
             {
-              "name": "POST Request a reset. Identical response for an address that does not exist.",
+              "name": "POST Request a reset. Identical response for an address that does not exist. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (",
               "request": {
                 "method": "POST",
                 "header": [
@@ -15592,7 +16289,7 @@
                     "password_resets"
                   ]
                 },
-                "description": "Request a reset. Identical response for an address that does not exist.\n\n`POST /v1/client/password_resets`"
+                "description": "Request a reset. Identical response for an address that does not exist. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email.\n\n`POST /v1/client/password_resets`"
               },
               "response": []
             },
@@ -15719,6 +16416,372 @@
                   ]
                 },
                 "description": "Submit the emailed code. Advances to MFA when the account has it.\n\n`POST /v1/client/password_resets/{id}/attempt_verification`"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "pca",
+          "item": [
+            {
+              "name": "GET Merkle inclusion proof for one ledger entry against the current head; verifies offline.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/ledger/:index/proof?grant_ref=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "ledger",
+                    ":index",
+                    "proof"
+                  ],
+                  "query": [
+                    {
+                      "key": "grant_ref",
+                      "value": "string",
+                      "disabled": false,
+                      "description": "The grant whose ledger is read."
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "index",
+                      "value": "index"
+                    }
+                  ]
+                },
+                "description": "Merkle inclusion proof for one ledger entry against the current head; verifies offline.\n\n`GET /v1/pca/ledger/{index}/proof`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET Poll a principal-device step-up: pending | approved | denied | expired, plus the ledger receipt once approved. The a",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/stepups/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "stepups",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Poll a principal-device step-up: pending | approved | denied | expired, plus the ledger receipt once approved. The agent polls this after a 202 from POST /v1/pca/actions.\n\n`GET /v1/pca/stepups/{id}`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET Status of an optimistic claim: open | settled | slashed | expired (a claim whose challenge window closed unchallenge",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/claims/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "claims",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Status of an optimistic claim: open | settled | slashed | expired (a claim whose challenge window closed unchallenged is finalized as expired).\n\n`GET /v1/pca/claims/{id}`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET The claim's guardian-signed bond settlement history (open | release | slash) plus the guardian public key to verify ",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/claims/:id/settlements",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "claims",
+                    ":id",
+                    "settlements"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "The claim's guardian-signed bond settlement history (open | release | slash) plus the guardian public key to verify each record.\n\n`GET /v1/pca/claims/{id}/settlements`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET The grant's ledger entries (commits; `shredded` marks erased openings). Openings are included only when a secret key",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/ledger/entries?grant_ref=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "ledger",
+                    "entries"
+                  ],
+                  "query": [
+                    {
+                      "key": "grant_ref",
+                      "value": "string",
+                      "disabled": false,
+                      "description": "The grant whose ledger is read."
+                    }
+                  ]
+                },
+                "description": "The grant's ledger entries (commits; `shredded` marks erased openings). Openings are included only when a secret key with pca:read is presented.\n\n`GET /v1/pca/ledger/entries`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET The grant's transparency-log head: entry count and Merkle root.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/ledger?grant_ref=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "ledger"
+                  ],
+                  "query": [
+                    {
+                      "key": "grant_ref",
+                      "value": "string",
+                      "disabled": false,
+                      "description": "The grant whose ledger is read."
+                    }
+                  ]
+                },
+                "description": "The grant's transparency-log head: entry count and Merkle root.\n\n`GET /v1/pca/ledger`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Commit a plan DAG under an active grant. Returns the Merkle plan_root that PCActns must carry. v0 auto-authorizes t",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"grant_ref\": \"string\",\n  \"nodes\": [\n    {\n      \"id\": \"string\",\n      \"verb\": \"string\",\n      \"resource\": \"string\",\n      \"params_digest\": \"string\",\n      \"reversibility_class\": \"string\",\n      \"pre\": \"string\",\n      \"post\": \"string\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/plans",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "plans"
+                  ]
+                },
+                "description": "Commit a plan DAG under an active grant. Returns the Merkle plan_root that PCActns must carry. v0 auto-authorizes the plan.\n\n`POST /v1/pca/plans`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Register a Root Intent Grant. Self-authenticating: the body is the principal's signed root capability; an invalid c",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"grant\": {}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/grants",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "grants"
+                  ]
+                },
+                "description": "Register a Root Intent Grant. Self-authenticating: the body is the principal's signed root capability; an invalid chain, non-root capability or missing envelope is a 400. Returns the grant_ref (201 new, 200 already registered).\n\n`POST /v1/pca/grants`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Submit a PCActn (PCA-Action header or { pcactn } body). Verifies the capability chain, plan inclusion, revocation, ",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"pcactn\": {},\n  \"params\": {},\n  \"subject\": {},\n  \"env\": {},\n  \"attestation\": {},\n  \"optimistic\": {}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/actions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "actions"
+                  ]
+                },
+                "description": "Submit a PCActn (PCA-Action header or { pcactn } body). Verifies the capability chain, plan inclusion, revocation, counter monotonicity, risk/policy and trust budget; on allow anchors it in the grant ledger and returns a receipt with an inclusion proof. 401 + WWW-Authenticate: PCA on missing/invalid credentials; 403 with the verdict on a denial (out-of-plan, revoked, replay, frozen).\n\n`POST /v1/pca/actions`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Submit the principal-device threshold share, signed over the PCActn's threshold message. Self-authenticating: it mu",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"role\": \"principal\",\n  \"publicKey\": \"string\",\n  \"sig\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/stepups/:id/cosign",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "stepups",
+                    ":id",
+                    "cosign"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Submit the principal-device threshold share, signed over the PCActn's threshold message. Self-authenticating: it must come from the grant's principal key. When distinct valid roles reach required_t the action is re-verified, anchored in the ledger and approved (receipt returned); otherwise the step-up stays pending (202).\n\n`POST /v1/pca/stepups/{id}/cosign`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Trigger re-adjudication of an open optimistic claim. The challenger supplies NO policy inputs (grief-proof): the se",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/pca/claims/:id/challenge",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "pca",
+                    "claims",
+                    ":id",
+                    "challenge"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Trigger re-adjudication of an open optimistic claim. The challenger supplies NO policy inputs (grief-proof): the server re-runs the decision from the context the agent recorded at open time, against the current grant + revocation set + time, and slashes only if that server-derived re-evaluation now contradicts the claim or the capability was revoked (audited). 409 when the claim is not open or no fraud is established.\n\n`POST /v1/pca/claims/{id}/challenge`"
               },
               "response": []
             }
@@ -16111,7 +17174,7 @@
               "response": []
             },
             {
-              "name": "POST Revoke one session; promote a parked account to active, or clear cookies if none remain.",
+              "name": "POST Revoke one session; promote a parked account to active, or clear cookies if none remain. OIDC apps signed in throug",
               "request": {
                 "method": "POST",
                 "header": [],
@@ -16134,7 +17197,7 @@
                     }
                   ]
                 },
-                "description": "Revoke one session; promote a parked account to active, or clear cookies if none remain.\n\n`POST /v1/client/sessions/{id}/revoke`"
+                "description": "Revoke one session; promote a parked account to active, or clear cookies if none remain. OIDC apps signed in through it are sent a back-channel logout; when the session was signed in on this browser, `frontchannel_logout_urls` lists the front-channel logout URLs (with `iss` and `sid`) for the page to load in hidden iframes.\n\n`POST /v1/client/sessions/{id}/revoke`"
               },
               "response": []
             },
@@ -16181,7 +17244,7 @@
               "response": []
             },
             {
-              "name": "POST Sign out of every other device. Spares the current session; bumps sessions_version.",
+              "name": "POST Sign out of every other device. Spares the current session; bumps sessions_version. OIDC apps signed in through the",
               "request": {
                 "method": "POST",
                 "header": [],
@@ -16197,7 +17260,7 @@
                     "revoke_all"
                   ]
                 },
-                "description": "Sign out of every other device. Spares the current session; bumps sessions_version.\n\n`POST /v1/client/sessions/revoke_all`"
+                "description": "Sign out of every other device. Spares the current session; bumps sessions_version. OIDC apps signed in through the ended sessions are sent a back-channel logout.\n\n`POST /v1/client/sessions/revoke_all`"
               },
               "response": []
             },
@@ -16733,7 +17796,7 @@
               "response": []
             },
             {
-              "name": "POST Send an email code or magic link. Returns the polling secret to this tab.",
+              "name": "POST Send an email code or magic link. Returns the polling secret to this tab. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED",
               "request": {
                 "method": "POST",
                 "header": [
@@ -16770,7 +17833,7 @@
                     }
                   ]
                 },
-                "description": "Send an email code or magic link. Returns the polling secret to this tab.\n\n`POST /v1/client/sign_ins/{id}/prepare_first_factor`"
+                "description": "Send an email code or magic link. Returns the polling secret to this tab. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email.\n\n`POST /v1/client/sign_ins/{id}/prepare_first_factor`"
               },
               "response": []
             },
@@ -16962,7 +18025,7 @@
           "name": "sign_ups",
           "item": [
             {
-              "name": "POST Reissue a verification code. Rate limited to 1/30s and 5/hour per address.",
+              "name": "POST Reissue a verification code. Rate limited to 1/30s and 5/hour per address. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURE",
               "request": {
                 "method": "POST",
                 "header": [],
@@ -16985,12 +18048,12 @@
                     }
                   ]
                 },
-                "description": "Reissue a verification code. Rate limited to 1/30s and 5/hour per address.\n\n`POST /v1/client/sign_ups/{id}/prepare_verification`"
+                "description": "Reissue a verification code. Rate limited to 1/30s and 5/hour per address. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email.\n\n`POST /v1/client/sign_ups/{id}/prepare_verification`"
               },
               "response": []
             },
             {
-              "name": "POST Start an email + password sign-up. Returns an attempt whose status drives the next step.",
+              "name": "POST Start an email + password sign-up. Returns an attempt whose status drives the next step. Returns 422 EMAIL_DELIVERY",
               "request": {
                 "method": "POST",
                 "header": [
@@ -17019,7 +18082,7 @@
                     "sign_ups"
                   ]
                 },
-                "description": "Start an email + password sign-up. Returns an attempt whose status drives the next step.\n\n`POST /v1/client/sign_ups`"
+                "description": "Start an email + password sign-up. Returns an attempt whose status drives the next step. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email.\n\n`POST /v1/client/sign_ups`"
               },
               "response": []
             },
@@ -17651,7 +18714,7 @@
           "name": "logout",
           "item": [
             {
-              "name": "GET RP-Initiated Logout end_session_endpoint (OIDC). Verifies the id_token_hint signature, revokes the end-user hosted s",
+              "name": "GET RP-Initiated Logout end_session_endpoint (OIDC). A verified id_token_hint names the OP session (its sid) to end; wit",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -17665,12 +18728,12 @@
                     "logout"
                   ]
                 },
-                "description": "RP-Initiated Logout end_session_endpoint (OIDC). Verifies the id_token_hint signature, revokes the end-user hosted session, fires Back-Channel and Front-Channel Logout to other RPs, and redirects only to an exact-match registered post_logout_redirect_uri.\n\n`GET /oauth2/logout`"
+                "description": "RP-Initiated Logout end_session_endpoint (OIDC). A verified id_token_hint names the OP session (its sid) to end; without one (or for a different session than the browser's) the user is asked to confirm first. Ends the Atlas session, sends Back-Channel and Front-Channel Logout (iss + sid) to every RP signed in through it, including the initiating one, then redirects only to an exact-match registered post_logout_redirect_uri.\n\n`GET /oauth2/logout`"
               },
               "response": []
             },
             {
-              "name": "POST RP-Initiated Logout end_session_endpoint (form post). Verifies the id_token_hint, revokes the hosted session, notif",
+              "name": "POST RP-Initiated Logout end_session_endpoint (form post). Same as GET; also receives the sign-out confirmation form (lo",
               "request": {
                 "method": "POST",
                 "header": [],
@@ -17692,6 +18755,14 @@
                     {
                       "key": "client_id",
                       "value": "string"
+                    },
+                    {
+                      "key": "logout_confirm",
+                      "value": "string"
+                    },
+                    {
+                      "key": "decision",
+                      "value": "logout"
                     }
                   ]
                 },
@@ -17705,7 +18776,7 @@
                     "logout"
                   ]
                 },
-                "description": "RP-Initiated Logout end_session_endpoint (form post). Verifies the id_token_hint, revokes the hosted session, notifies other RPs (Back-/Front-Channel Logout), and redirects only to an exact-match registered post_logout_redirect_uri.\n\n`POST /oauth2/logout`"
+                "description": "RP-Initiated Logout end_session_endpoint (form post). Same as GET; also receives the sign-out confirmation form (logout_confirm + decision). Ends the OP session named by the id_token_hint sid (or the confirmed browser session), notifies every RP signed in through it (Back-/Front-Channel Logout), and redirects only to an exact-match registered post_logout_redirect_uri.\n\n`POST /oauth2/logout`"
               },
               "response": []
             }
@@ -19144,6 +20215,188 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "atlas_id_apps",
+          "item": [
+            {
+              "name": "DELETE Delete a Sign in with Atlas app. Its client_id stops working immediately and users' approvals for it are removed.",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/platform/atlas_id_apps/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "platform",
+                    "atlas_id_apps",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Delete a Sign in with Atlas app. Its client_id stops working immediately and users' approvals for it are removed.\n**Required scope:** `platform:atlas_id_apps:write`\n\n`DELETE /v1/platform/atlas_id_apps/{id}`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET Fetch one Sign in with Atlas app, including user_count (people who have approved it). Another account's app is 404. ",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/platform/atlas_id_apps/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "platform",
+                    "atlas_id_apps",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Fetch one Sign in with Atlas app, including user_count (people who have approved it). Another account's app is 404. Never a secret.\n**Required scope:** `platform:atlas_id_apps:read`\n\n`GET /v1/platform/atlas_id_apps/{id}`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET List the Sign in with Atlas apps registered to this platform's account, with the issuer and discovery URL. Never ret",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/platform/atlas_id_apps",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "platform",
+                    "atlas_id_apps"
+                  ]
+                },
+                "description": "List the Sign in with Atlas apps registered to this platform's account, with the issuer and discovery URL. Never returns a secret.\n**Required scope:** `platform:atlas_id_apps:read`\n\n`GET /v1/platform/atlas_id_apps`"
+              },
+              "response": []
+            },
+            {
+              "name": "PATCH Update a Sign in with Atlas app: name, redirect_uris, post_logout_redirect_uris ([] clears them), backchannel_logo",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"string\",\n  \"redirect_uris\": [\n    \"string\"\n  ],\n  \"post_logout_redirect_uris\": [\n    \"string\"\n  ],\n  \"backchannel_logout_uri\": \"string\",\n  \"backchannel_logout_session_required\": false,\n  \"frontchannel_logout_uri\": \"string\",\n  \"frontchannel_logout_session_required\": false,\n  \"logo_url\": \"string\",\n  \"homepage_url\": \"string\",\n  \"allowed_scopes\": [\n    \"string\"\n  ],\n  \"branding\": {\n    \"theme\": \"auto\",\n    \"accent_color\": \"string\",\n    \"background_color\": \"string\",\n    \"privacy_policy_url\": \"string\",\n    \"terms_of_service_url\": \"string\",\n    \"design\": {\n      \"version\": \"string\",\n      \"preset\": \"minimal\",\n      \"colorScheme\": \"auto\",\n      \"palette\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"paletteDark\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"typography\": {\n        \"font\": \"system\",\n        \"headingFont\": \"system\",\n        \"baseSize\": 0,\n        \"headingWeight\": 0,\n        \"bodyWeight\": 0,\n        \"letterCase\": \"none\",\n        \"scale\": \"minor-second\"\n      },\n      \"shape\": {\n        \"radius\": 0,\n        \"controlRadius\": 0,\n        \"borderWidth\": 0\n      },\n      \"elevation\": {\n        \"cardShadow\": \"none\"\n      },\n      \"spacing\": {\n        \"density\": \"compact\"\n      },\n      \"card\": {\n        \"style\": \"solid\",\n        \"blur\": 0,\n        \"width\": \"narrow\"\n      },\n      \"layout\": {\n        \"position\": \"center\",\n        \"splitImageSide\": \"left\",\n        \"logoPlacement\": \"card\",\n        \"logoSize\": \"sm\"\n      },\n      \"buttons\": {\n        \"style\": \"solid\",\n        \"socialLayout\": \"list\"\n      },\n      \"inputs\": {\n        \"style\": \"outline\"\n      },\n      \"background\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"backgroundDark\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"logo\": {\n        \"assetId\": \"string\",\n        \"darkAssetId\": \"string\"\n      }\n    },\n    \"copy\": {\n      \"sign_in_title\": \"string\",\n      \"sign_in_subtitle\": \"string\",\n      \"sign_up_title\": \"string\",\n      \"sign_up_subtitle\": \"string\",\n      \"consent_message\": \"string\",\n      \"support_url\": \"string\",\n      \"support_label\": \"string\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/platform/atlas_id_apps/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "platform",
+                    "atlas_id_apps",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Update a Sign in with Atlas app: name, redirect_uris, post_logout_redirect_uris ([] clears them), backchannel_logout_uri / frontchannel_logout_uri (empty or null clears) and their *_session_required flags, allowed_scopes, logo_url, homepage_url, branding (merged per field; null clears). The app type cannot change. Apps managed by an instance's Sign in with Atlas toggle are 409.\n**Required scope:** `platform:atlas_id_apps:write`\n\n`PATCH /v1/platform/atlas_id_apps/{id}`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Register a Sign in with Atlas app (an OpenID Connect client on https://atlasauth.net) for this platform's account. ",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"string\",\n  \"redirect_uris\": [\n    \"string\"\n  ],\n  \"post_logout_redirect_uris\": [\n    \"string\"\n  ],\n  \"backchannel_logout_uri\": \"string\",\n  \"backchannel_logout_session_required\": false,\n  \"frontchannel_logout_uri\": \"string\",\n  \"frontchannel_logout_session_required\": false,\n  \"logo_url\": \"string\",\n  \"homepage_url\": \"string\",\n  \"allowed_scopes\": [\n    \"string\"\n  ],\n  \"branding\": {\n    \"theme\": \"auto\",\n    \"accent_color\": \"string\",\n    \"background_color\": \"string\",\n    \"privacy_policy_url\": \"string\",\n    \"terms_of_service_url\": \"string\",\n    \"design\": {\n      \"version\": \"string\",\n      \"preset\": \"minimal\",\n      \"colorScheme\": \"auto\",\n      \"palette\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"paletteDark\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"typography\": {\n        \"font\": \"system\",\n        \"headingFont\": \"system\",\n        \"baseSize\": 0,\n        \"headingWeight\": 0,\n        \"bodyWeight\": 0,\n        \"letterCase\": \"none\",\n        \"scale\": \"minor-second\"\n      },\n      \"shape\": {\n        \"radius\": 0,\n        \"controlRadius\": 0,\n        \"borderWidth\": 0\n      },\n      \"elevation\": {\n        \"cardShadow\": \"none\"\n      },\n      \"spacing\": {\n        \"density\": \"compact\"\n      },\n      \"card\": {\n        \"style\": \"solid\",\n        \"blur\": 0,\n        \"width\": \"narrow\"\n      },\n      \"layout\": {\n        \"position\": \"center\",\n        \"splitImageSide\": \"left\",\n        \"logoPlacement\": \"card\",\n        \"logoSize\": \"sm\"\n      },\n      \"buttons\": {\n        \"style\": \"solid\",\n        \"socialLayout\": \"list\"\n      },\n      \"inputs\": {\n        \"style\": \"outline\"\n      },\n      \"background\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"backgroundDark\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"logo\": {\n        \"assetId\": \"string\",\n        \"darkAssetId\": \"string\"\n      }\n    },\n    \"copy\": {\n      \"sign_in_title\": \"string\",\n      \"sign_in_subtitle\": \"string\",\n      \"sign_up_title\": \"string\",\n      \"sign_up_subtitle\": \"string\",\n      \"consent_message\": \"string\",\n      \"support_url\": \"string\",\n      \"support_label\": \"string\"\n    }\n  },\n  \"type\": \"confidential\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/platform/atlas_id_apps",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "platform",
+                    "atlas_id_apps"
+                  ]
+                },
+                "description": "Register a Sign in with Atlas app (an OpenID Connect client on https://atlasauth.net) for this platform's account. Body: name, redirect_uris (exact-match https URLs; http://localhost allowed), type (`confidential`, the default, gets a client_secret returned exactly once; `public` uses PKCE and has no secret), optional allowed_scopes (openid, profile, email, offline_access; openid is always required; refresh tokens only with offline_access), logo_url and homepage_url, optional branding (theme, accent_color, background_color, privacy_policy_url, terms_of_service_url) for the sign-in page, post_logout_redirect_uris (exact-match sign-out return URLs for /oauth2/logout, same URL rule as redirect_uris; default []), and backchannel_logout_uri / frontchannel_logout_uri (+ *_session_required) for OIDC back- and front-channel logout. At most 25 apps per account. Honours Idempotency-Key. Keys restricted to specific apps get 403.\n**Required scope:** `platform:atlas_id_apps:write`\n\n`POST /v1/platform/atlas_id_apps`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Rotate a confidential app's client_secret. The new secret is returned exactly once; the previous one keeps working ",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/platform/atlas_id_apps/:id/rotate_secret",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "platform",
+                    "atlas_id_apps",
+                    ":id",
+                    "rotate_secret"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Rotate a confidential app's client_secret. The new secret is returned exactly once; the previous one keeps working for 24 hours. Public apps are 409.\n**Required scope:** `platform:atlas_id_apps:write`\n\n`POST /v1/platform/atlas_id_apps/{id}/rotate_secret`"
+              },
+              "response": []
+            }
+          ]
         }
       ]
     },
@@ -20204,6 +21457,53 @@
           ]
         },
         {
+          "name": "oauth-protected-resource",
+          "item": [
+            {
+              "name": "GET Path-qualified RFC 9728 protected-resource metadata for the MCP endpoint /v1/client/me/mcp — the same document, at t",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/.well-known/oauth-protected-resource/v1/client/me/mcp",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    ".well-known",
+                    "oauth-protected-resource",
+                    "v1",
+                    "client",
+                    "me",
+                    "mcp"
+                  ]
+                },
+                "description": "Path-qualified RFC 9728 protected-resource metadata for the MCP endpoint /v1/client/me/mcp — the same document, at the path an MCP client derives from the resource URL.\n\n`GET /.well-known/oauth-protected-resource/v1/client/me/mcp`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET RFC 9728 OAuth Protected Resource Metadata for the instance on this host's remote MCP endpoint: the resource identif",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/.well-known/oauth-protected-resource",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    ".well-known",
+                    "oauth-protected-resource"
+                  ]
+                },
+                "description": "RFC 9728 OAuth Protected Resource Metadata for the instance on this host's remote MCP endpoint: the resource identifier, the authorization server, and supported scopes. A disabled connector or unknown host is a 404.\n\n`GET /.well-known/oauth-protected-resource`"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
           "name": "openapi.json",
           "item": [
             {
@@ -20387,6 +21687,29 @@
                   ]
                 },
                 "description": "Atlas-as-SAML-IdP metadata (pk-resolved): entityId, signing certificate and SSO bindings for a downstream SP to import.\n\n`GET /v1/saml/idp/metadata`"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "sign-in-with-atlas.js",
+          "item": [
+            {
+              "name": "GET Drop-in \"Sign in with Atlas\" button script for any website: upgrades [data-atlas-signin] elements and exposes window",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/sign-in-with-atlas.js",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "sign-in-with-atlas.js"
+                  ]
+                },
+                "description": "Drop-in \"Sign in with Atlas\" button script for any website: upgrades [data-atlas-signin] elements and exposes window.AtlasID (OIDC authorization code + PKCE).\n\n`GET /sign-in-with-atlas.js`"
               },
               "response": []
             }
