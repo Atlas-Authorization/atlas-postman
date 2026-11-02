@@ -48844,7 +48844,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"url\": \"string\",\n  \"enabled_events\": [\n    \"string\"\n  ],\n  \"active\": false,\n  \"event_naming\": \"canonical\",\n  \"external\": false,\n  \"signature_versions\": [\n    \"v1\"\n  ],\n  \"alert_contacts\": [\n    \"user@example.com\"\n  ],\n  \"description\": \"string\",\n  \"destination\": {\n    \"type\": \"https\"\n  },\n  \"destination_credentials\": {},\n  \"metadata\": {}\n}",
+                  "raw": "{\n  \"url\": \"string\",\n  \"enabled_events\": [\n    \"string\"\n  ],\n  \"active\": false,\n  \"event_naming\": \"canonical\",\n  \"external\": false,\n  \"managed_by\": \"cookiemunch\",\n  \"signature_versions\": [\n    \"v1\"\n  ],\n  \"alert_contacts\": [\n    \"user@example.com\"\n  ],\n  \"description\": \"string\",\n  \"destination\": {\n    \"type\": \"https\"\n  },\n  \"destination_credentials\": {},\n  \"metadata\": {}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -48958,7 +48958,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"url\": \"string\",\n  \"enabled_events\": [\n    \"string\"\n  ],\n  \"active\": false,\n  \"event_naming\": \"canonical\",\n  \"external\": false,\n  \"signature_versions\": [\n    \"v1\"\n  ],\n  \"alert_contacts\": [\n    \"user@example.com\"\n  ],\n  \"description\": \"string\",\n  \"destination\": {\n    \"type\": \"https\"\n  },\n  \"destination_credentials\": {},\n  \"metadata\": {},\n  \"external_ref\": \"string\",\n  \"secret\": \"string\"\n}",
+                  "raw": "{\n  \"url\": \"string\",\n  \"enabled_events\": [\n    \"string\"\n  ],\n  \"active\": false,\n  \"event_naming\": \"canonical\",\n  \"external\": false,\n  \"managed_by\": \"cookiemunch\",\n  \"signature_versions\": [\n    \"v1\"\n  ],\n  \"alert_contacts\": [\n    \"user@example.com\"\n  ],\n  \"description\": \"string\",\n  \"destination\": {\n    \"type\": \"https\"\n  },\n  \"destination_credentials\": {},\n  \"metadata\": {},\n  \"external_ref\": \"string\",\n  \"secret\": \"string\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -49155,7 +49155,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"url\": \"string\",\n  \"enabled_events\": [\n    \"string\"\n  ],\n  \"active\": false,\n  \"event_naming\": \"canonical\",\n  \"external\": false,\n  \"signature_versions\": [\n    \"v1\"\n  ],\n  \"alert_contacts\": [\n    \"user@example.com\"\n  ],\n  \"description\": \"string\",\n  \"destination\": {\n    \"type\": \"https\"\n  },\n  \"destination_credentials\": {}\n}",
+                  "raw": "{\n  \"url\": \"string\",\n  \"enabled_events\": [\n    \"string\"\n  ],\n  \"active\": false,\n  \"event_naming\": \"canonical\",\n  \"external\": false,\n  \"managed_by\": \"cookiemunch\",\n  \"signature_versions\": [\n    \"v1\"\n  ],\n  \"alert_contacts\": [\n    \"user@example.com\"\n  ],\n  \"description\": \"string\",\n  \"destination\": {\n    \"type\": \"https\"\n  },\n  \"destination_credentials\": {}\n}",
                   "options": {
                     "raw": {
                       "language": "json"
