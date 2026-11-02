@@ -19996,6 +19996,34 @@
               "response": []
             },
             {
+              "name": "GET Every cookie and browser-storage key the hosted pages set for this instance as a CMP-neutral declaration (name, prov",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/storage_declaration?format=json",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "storage_declaration"
+                  ],
+                  "query": [
+                    {
+                      "key": "format",
+                      "value": "json",
+                      "disabled": true,
+                      "description": "json (default), or csv: name,provider,domain,category,purpose,duration,duration_seconds,type,description for a generic importer."
+                    }
+                  ]
+                },
+                "description": "Every cookie and browser-storage key the hosted pages set for this instance as a CMP-neutral declaration (name, provider, domain, category, type cookie or localStorage, duration, description), with the domain computed from your sign-in host and cross-subdomain setting. A consent manager imports it once; no manual rows. Needs only cookie_consent:read. Without a key the same list is public: GET /v1/storage_declaration on the Frontend API host.\n**Required scope:** `cookie_consent:read`\n\n`GET /v1/instance/storage_declaration`"
+              },
+              "response": []
+            },
+            {
               "name": "GET Every identity integration: the four presets (chatly, forumulate, cookiemunch, referalli; connected or not) and ever",
               "request": {
                 "method": "GET",
@@ -21181,7 +21209,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"enabled\": false,\n  \"url\": \"string\",\n  \"signing_secret\": \"string\",\n  \"timeout_ms\": 0,\n  \"fail_closed\": false\n}",
+                  "raw": "{\n  \"enabled\": false,\n  \"url\": \"string\",\n  \"signing_secret\": \"string\",\n  \"timeout_ms\": 0,\n  \"fail_closed\": false,\n  \"force\": false\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -21189,7 +21217,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/v1/instance/hooks/before_user_create",
+                  "raw": "{{baseUrl}}/v1/instance/hooks/before_user_create?force=false",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -21198,9 +21226,17 @@
                     "instance",
                     "hooks",
                     "before_user_create"
+                  ],
+                  "query": [
+                    {
+                      "key": "force",
+                      "value": "false",
+                      "disabled": true,
+                      "description": "true = skip the signed test call that enabling or re-pointing the hook otherwise makes first."
+                    }
                   ]
                 },
-                "description": "Update the before_user_create hook. Only the fields you send change; null clears. The hook is called (signed like a webhook) after the user id is assigned and before user.created, the referral call and any session. It may answer {external_id, public_metadata, private_metadata, unsafe_metadata}, or deny the sign-up with {\"deny\": true, \"reason\": \"...\"} or HTTP 403: the person gets 403 SIGN_UP_DENIED with your reason, no user is kept and no user.created is sent. A slow or failing hook does not block the sign-up unless fail_closed is true.\n**Required scope:** `instance:write`\n\n`PATCH /v1/instance/hooks/before_user_create`"
+                "description": "Update the before_user_create hook. Only the fields you send change; null clears. The hook is called (signed like a webhook) after the user id is assigned and before user.created, the referral call and any session. It may answer {external_id, public_metadata, private_metadata, unsafe_metadata}, or deny the sign-up with {\"deny\": true, \"reason\": \"...\"} or HTTP 403: the person gets 403 SIGN_UP_DENIED with your reason, no user is kept and no user.created is sent. A slow or failing hook does not block the sign-up unless fail_closed is true. The body carries data.user, data.strategy, data.referral, data.request ({client_id, app_context, login_hint} of the authorize request, nulls when absent) and data.invitation (the pending instance invitation for the address, or null). Turning the hook on, or changing the url or signing_secret of an enabled one, first sends the signed test call: unless it returns a valid answer (an answer object, possibly empty, or a deny) the change is refused with 409 HOOK_TEST_FAILED (meta: url, status, the first 200 bytes of the response body, outcome) and the hook stays as it was. ?force=true (or force in the body) skips the test and is audit-logged. A dry run (?dry_run=true) does not call the hook.\n**Required scope:** `instance:write`\n\n`PATCH /v1/instance/hooks/before_user_create`"
               },
               "response": []
             },
@@ -21216,7 +21252,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"enabled\": false,\n  \"provider\": \"string\",\n  \"endpoint_url\": \"string\",\n  \"program_id\": \"string\",\n  \"connection_id\": \"string\",\n  \"signing_secret\": \"string\",\n  \"inbound_secret\": \"string\",\n  \"inbound_endpoint_id\": \"string\",\n  \"api_key\": \"string\",\n  \"url_params\": [\n    \"string\"\n  ],\n  \"context_cookie\": \"string\",\n  \"context_cookies\": [\n    \"string\"\n  ],\n  \"consent_category\": \"string\",\n  \"consent_fallback_category\": \"string\",\n  \"auto_enroll_users\": false,\n  \"link_template\": \"string\",\n  \"partner_portal_url\": \"string\",\n  \"timeout_ms\": 0,\n  \"tracking_token\": \"string\",\n  \"code_lookup_url\": \"string\",\n  \"signup_code_field\": false,\n  \"browser_sources\": [\n    \"referalli\"\n  ],\n  \"consent_provider\": \"auto\",\n  \"security\": {\n    \"challenge_referred_signups\": \"always\",\n    \"on_high_risk\": \"flag\",\n    \"hold_until_email_verified\": false,\n    \"max_referred_signups_per_ip_hour\": 0\n  },\n  \"forward_lifecycle\": false,\n  \"mirror_to_public_metadata\": false,\n  \"include_referral_claims\": false,\n  \"report_linked_atlas_id_signups\": false\n}",
+                  "raw": "{\n  \"enabled\": false,\n  \"provider\": \"string\",\n  \"endpoint_url\": \"string\",\n  \"program_id\": \"string\",\n  \"connection_id\": \"string\",\n  \"signing_secret\": \"string\",\n  \"inbound_secret\": \"string\",\n  \"inbound_endpoint_id\": \"string\",\n  \"api_key\": \"string\",\n  \"url_params\": [\n    \"string\"\n  ],\n  \"context_cookie\": \"string\",\n  \"context_cookies\": [\n    \"string\"\n  ],\n  \"consent_category\": \"string\",\n  \"consent_fallback_category\": \"string\",\n  \"auto_enroll_users\": false,\n  \"link_template\": \"string\",\n  \"partner_portal_url\": \"string\",\n  \"timeout_ms\": 0,\n  \"tracking_token\": \"string\",\n  \"code_lookup_url\": \"string\",\n  \"signup_code_field\": false,\n  \"browser_sources\": [\n    \"referalli\"\n  ],\n  \"consent_provider\": \"auto\",\n  \"security\": {\n    \"challenge_referred_signups\": \"always\",\n    \"on_high_risk\": \"flag\",\n    \"hold_until_email_verified\": false,\n    \"max_referred_signups_per_ip_hour\": 0\n  },\n  \"forward_lifecycle\": false,\n  \"mirror_to_public_metadata\": false,\n  \"include_referral_claims\": false,\n  \"report_linked_atlas_id_signups\": false,\n  \"hosted_panel\": \"link\",\n  \"backfill_existing_users\": false\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -41689,6 +41725,33 @@
           "name": "sessions",
           "item": [
             {
+              "name": "GET Cheap session-freshness check for a relying party: `{ id, status, user_id, expires_at, last_active_at? }`, where sta",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/sessions/:id/status",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "sessions",
+                    ":id",
+                    "status"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Cheap session-freshness check for a relying party: `{ id, status, user_id, expires_at, last_active_at? }`, where status is active, expired, revoked or ended. `:id` is the session id or the `sid` claim of an ID token (a device or CIBA sign-in answers from its grant, without last_active_at). Sent with `Cache-Control: private, max-age=5` and an ETag; `If-None-Match` answers 304. Another instance session is 404, never 403. A banned user session is revoked at once and the back-channel logout is sent in the same request.\n**Required scope:** `sessions:read`\n\n`GET /v1/sessions/{id}/status`"
+              },
+              "response": []
+            },
+            {
               "name": "GET Fetch a single session. Another instance session id is 404, never 403.",
               "request": {
                 "method": "GET",
@@ -54234,6 +54297,28 @@
               "response": []
             },
             {
+              "name": "POST A short-lived token for the referral platform's live widget, minted server-side for the signed-in user (the hosted ",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/client/me/referral/widget",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "client",
+                    "me",
+                    "referral",
+                    "widget"
+                  ]
+                },
+                "description": "A short-lived token for the referral platform's live widget, minted server-side for the signed-in user (the hosted account page mounts the widget with it; no secret reaches the browser). Answers 200 { available: true, token, expires_at, program_id, script_url, referral_code, referral_link } or 200 { available: false, reason } with reason not_enabled (hosted_panel is not \"widget\"), not_supported, not_enrolled or platform_error: draw the static code-and-link panel then. Never an error for a slow or down platform.\n\n`POST /v1/client/me/referral/widget`"
+              },
+              "response": []
+            },
+            {
               "name": "POST Accept a suggestion, creating a pending join request an admin then decides.",
               "request": {
                 "method": "POST",
@@ -63861,7 +63946,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"email\": \"string\",\n  \"username\": \"string\",\n  \"captcha_token\": \"string\",\n  \"fields\": {},\n  \"consent\": false,\n  \"policy_acceptances\": [\n    {\n      \"policy\": \"string\",\n      \"version_id\": \"string\",\n      \"content_sha256\": \"string\",\n      \"display\": \"checkbox\",\n      \"scrolled_to_end\": false,\n      \"view_ms\": 0,\n      \"locale\": \"string\"\n    }\n  ],\n  \"organization_id\": \"string\",\n  \"referral\": {\n    \"code\": \"string\",\n    \"click_id\": \"string\",\n    \"anon_id\": \"string\",\n    \"consent\": \"granted\",\n    \"captured_at\": \"string\"\n  }\n}",
+                  "raw": "{\n  \"email\": \"string\",\n  \"username\": \"string\",\n  \"captcha_token\": \"string\",\n  \"fields\": {},\n  \"consent\": false,\n  \"policy_acceptances\": [\n    {\n      \"policy\": \"string\",\n      \"version_id\": \"string\",\n      \"content_sha256\": \"string\",\n      \"display\": \"checkbox\",\n      \"scrolled_to_end\": false,\n      \"view_ms\": 0,\n      \"locale\": \"string\"\n    }\n  ],\n  \"organization_id\": \"string\",\n  \"referral\": {\n    \"code\": \"string\",\n    \"click_id\": \"string\",\n    \"anon_id\": \"string\",\n    \"consent\": \"granted\",\n    \"captured_at\": \"string\"\n  },\n  \"redirect_url\": \"string\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -64040,6 +64125,44 @@
                   ]
                 },
                 "description": "DiscourseConnect return endpoint — verifies the signed payload and completes the sign-in.\n\n`GET /v1/sso/discourse/callback`"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "storage_declaration",
+          "item": [
+            {
+              "name": "GET The cookies and browser-storage keys of the hosted pages as a CMP-neutral declaration (name, provider, domain, categ",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/storage_declaration?publishable_key=string&format=json",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "storage_declaration"
+                  ],
+                  "query": [
+                    {
+                      "key": "publishable_key",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "Your publishable key, when not sent as the x-publishable-key header. Optional on the instance's own Frontend API host."
+                    },
+                    {
+                      "key": "format",
+                      "value": "json",
+                      "disabled": true,
+                      "description": "json (default), or csv: name,provider,domain,category,purpose,duration,duration_seconds,type,description for a generic importer."
+                    }
+                  ]
+                },
+                "description": "The cookies and browser-storage keys of the hosted pages as a CMP-neutral declaration (name, provider, domain, category, type cookie or localStorage, duration, description), for a consent manager to import without a key. The same rows as GET /v1/cookie_manifest, in the declaration shape. Served by publishable key, or by the instance's own Frontend API host with no key. Nothing in it is secret.\n\n`GET /v1/storage_declaration`"
               },
               "response": []
             }
@@ -64348,7 +64471,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/oauth2/authorize?response_type=code&client_id=string&redirect_uri=string&scope=string&state=string&nonce=string&code_challenge=string&code_challenge_method=S256&audience=string&resource=string&response_mode=string&request=string&request_uri=string&authorization_details=string&grant_management_action=create&grant_id=string&prompt=string&max_age=0&login_hint=string&domain_hint=string&ui_locales=string&acr_values=string&id_token_hint=string&claims=string&organization=string&organization_hint=string&org=string&login_verifier=string&audience_hint=string&ref=string&ref_click_id=string&ref_anon_id=string&ref_consent=granted&ref_captured_at=string&ref_source=string&ref_consent_by=string",
+                  "raw": "{{baseUrl}}/oauth2/authorize?response_type=code&client_id=string&redirect_uri=string&scope=string&state=string&nonce=string&code_challenge=string&code_challenge_method=S256&audience=string&resource=string&response_mode=string&request=string&request_uri=string&authorization_details=string&grant_management_action=create&grant_id=string&prompt=string&max_age=0&login_hint=string&domain_hint=string&ui_locales=string&acr_values=string&id_token_hint=string&claims=string&organization=string&organization_hint=string&org=string&app_context=string&login_verifier=string&audience_hint=string&ref=string&ref_click_id=string&ref_anon_id=string&ref_consent=granted&ref_captured_at=string&ref_source=string&ref_consent_by=string",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -64520,6 +64643,12 @@
                       "description": "Alias of organization_hint."
                     },
                     {
+                      "key": "app_context",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "An opaque value of your own (at most 512 bytes, no control characters; an invite token, a tenant hint). Carried through the hosted sign-in and sign-up pages (including prompt=create) to the user the sign-up creates, and sent to your before_user_create hook as data.request.app_context next to data.request.client_id and data.request.login_hint. Never logged in full. It comes from the browser: verify it in your hook. Longer or malformed values are refused with an error page. Also accepted in a PAR body and in a request object."
+                    },
+                    {
                       "key": "login_verifier",
                       "value": "string",
                       "disabled": true,
@@ -64678,6 +64807,10 @@
                     },
                     {
                       "key": "request_uri",
+                      "value": "string"
+                    },
+                    {
+                      "key": "app_context",
                       "value": "string"
                     }
                   ]
@@ -65635,6 +65768,10 @@
                     },
                     {
                       "key": "grant_id",
+                      "value": "string"
+                    },
+                    {
+                      "key": "app_context",
                       "value": "string"
                     }
                   ]
@@ -74119,6 +74256,101 @@
                   ]
                 },
                 "description": "Signed partner deliveries for an instance that is a partner platform of `partner` (a preset such as Cookie Munch, or any product that signs with a published Ed25519 key set). The signature header (Cookie Munch: `CookieMunch-Partner-Signature: t=<unix s>,kid=<key id>,ed25519=<base64url>`) signs `<t>.<raw body>` with the key `kid` names in the partner's JWKS (cached 10 minutes; an unknown kid refetches it, at most once a minute). `t` must be within the tolerance (300 s by default); each delivery and each event id is processed once. A `consent.recorded` / `consent.withdrawn` event from a site the instance named is recorded on the matched user's consent history (`cookie_consent.<category>`, source `partner:<partner>`): matched by `sub`, then `ext`, then an email only when the delivery says it is verified. A delivery that names nobody is accepted as `no_subject` and writes nothing. 401 with `reason` (missing_signature, malformed_signature, stale, unknown_kid, bad_signature); 503 when the key set cannot be read; 403 `wrong_receiver` for a body naming another account; 404 when no partner platform is set up; otherwise 200.\n\n`POST /v1/partner_deliveries/{partner}/{instanceId}`"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "partner_executor_keys",
+          "item": [
+            {
+              "name": "DELETE The partner says the connection or the site link is gone: same signature scheme and body as the mint (`{ partner,",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\"string\"",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/partner_executor_keys/:partner/:instanceId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "partner_executor_keys",
+                    ":partner",
+                    ":instanceId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "partner",
+                      "value": "partner"
+                    },
+                    {
+                      "key": "instanceId",
+                      "value": "instanceId"
+                    }
+                  ]
+                },
+                "description": "The partner says the connection or the site link is gone: same signature scheme and body as the mint (`{ partner, externalId, cbid, nonce, iat }`). Revokes the data-rights keys Atlas minted for that site; 200 `{ revoked }` (0 when none was live). The same refusals as the mint apply (401, 403 `wrong_receiver`, 404, 409 `replayed`, 429, 503). Atlas also revokes these keys when the partner link or registration is removed, and a daily check revokes keys whose link the partner no longer lists.\n\n`DELETE /v1/partner_executor_keys/{partner}/{instanceId}`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST A partner (a preset such as Cookie Munch) asks Atlas to mint it a narrow data-rights key for one instance, so the s",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\"string\"",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/partner_executor_keys/:partner/:instanceId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "partner_executor_keys",
+                    ":partner",
+                    ":instanceId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "partner",
+                      "value": "partner"
+                    },
+                    {
+                      "key": "instanceId",
+                      "value": "instanceId"
+                    }
+                  ]
+                },
+                "description": "A partner (a preset such as Cookie Munch) asks Atlas to mint it a narrow data-rights key for one instance, so the site owner never copies an instance secret key to it (`mintFrom: \"atlas\"`). The partner signs the request like its deliveries (Cookie Munch: `CookieMunch-Partner-Signature: t=<unix s>,kid=<key id>,ed25519=<base64url>` over `<t>.<raw body>`, key picked by `kid` from its JWKS; retired keys verify). Body: `{ partner, externalId, cbid, orgId, nonce, iat }`; `partner` and `externalId` must match the URL, `t` and `iat` must be within 5 minutes, a `nonce` is honoured once, and the instance must have linked the partner site (confirmed through the partner links API when a partner token is in reach). Answers 201 `{ secret, executorUrl }`: a new secret key holding only `privacy:data_rights` (person lookup by email, data subject requests, the /v1/privacy/* executor protocol; every other route is 403), labelled with the partner and site, visible in the key list and revocable like any key. A second valid mint for the same site rotates: the previous key is revoked. 401 with `reason` (missing_signature, malformed_signature, stale, unknown_kid, bad_signature); 403 `wrong_receiver` or `not_linked`; 404 for a partner that mints no keys; 409 `replayed`; 429; 503 when the key set or the partner cannot be reached (retry).\n\n`POST /v1/partner_executor_keys/{partner}/{instanceId}`"
               },
               "response": []
             }
