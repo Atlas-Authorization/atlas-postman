@@ -19544,6 +19544,34 @@
               "response": []
             },
             {
+              "name": "DELETE Remove an acknowledgement: the findings with this code count again. 404 when the code has none. A config-changelo",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/preflight/acks/:code",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "preflight",
+                    "acks",
+                    ":code"
+                  ],
+                  "variable": [
+                    {
+                      "key": "code",
+                      "value": "code"
+                    }
+                  ]
+                },
+                "description": "Remove an acknowledgement: the findings with this code count again. 404 when the code has none. A config-changelog entry (preflight_ack.removed).\n**Required scope:** `instance:write`\n\n`DELETE /v1/instance/preflight/acks/{code}`"
+              },
+              "response": []
+            },
+            {
               "name": "DELETE Remove an identity integration and its receivers; getToken({ for }) answers 404 for it from then on.",
               "request": {
                 "method": "DELETE",
@@ -19943,7 +19971,7 @@
                     }
                   ]
                 },
-                "description": "Check your setup in one call. Lists findings about configuration the server can see is broken or worth knowing — no sign-in method enabled, a social provider enabled without credentials, OAuth clients without redirect or post-logout URIs, a first-party client origin missing from allowed_origins, an allowed https origin that login readiness would fail (CORS or session cookie), sign-up that new users cannot complete, custom domains not serving yet, email or SMS sign-in without a provider, a Cookie Munch site that does not match the sign-in host, an OAuth client whose back-channel logout URI is failing (oauth_client_backchannel_failing: 3 consecutive failed deliveries, or one answered with a redirect, which Atlas never follows), a webhook endpoint whose last delivery was redirected (webhook_endpoint_redirecting), a webhook endpoint that is failing (webhook_endpoint_failing: a failure streak is running), switched off after repeated failures (webhook_endpoint_disabled: an error when it carries session or account events) or on a host that is not one of the instance origins or redirect hosts (webhook_endpoint_off_origin, unless it is marked external), a first-party client without a back-channel logout URI (oauth_client_no_backchannel_logout_uri), and the security posture group (group: security_posture — pkce_not_required, passkey_without_uv, auto_link_unverified) — each with a severity, a stable code, a plain message and the fix. A finding that does not apply to how the instance integrates (the embedded-component checks on an origin Atlas is confident signs in through the hosted redirect) is listed under suppressed with the reason, not in findings; integrations shows how each allowed origin was judged. ok is true when there are no errors. ok covers configuration; to confirm a browser can sign in on a given origin, use GET /v1/diagnostics/login_readiness?origin=… for each production origin. Every code is listed by GET /v1/instance/preflight/codes. Read-only.\n**Required scope:** `diagnostics:read`\n\n`GET /v1/instance/preflight`"
+                "description": "Check your setup in one call. Lists findings about configuration the server can see is broken or worth knowing — no sign-in method enabled, a social provider enabled without credentials, OAuth clients without redirect or post-logout URIs, a first-party client origin missing from allowed_origins, an allowed https origin that login readiness would fail (CORS or session cookie), sign-up that new users cannot complete, custom domains not serving yet, email or SMS sign-in without a provider, a Cookie Munch site that does not match the sign-in host, an OAuth client whose back-channel logout URI is failing (oauth_client_backchannel_failing: 3 consecutive failed deliveries, or one answered with a redirect, which Atlas never follows), a webhook endpoint whose last delivery was redirected (webhook_endpoint_redirecting), a webhook endpoint that is failing (webhook_endpoint_failing: a failure streak is running), switched off after repeated failures (webhook_endpoint_disabled: an error when it carries session or account events) or on a host that is not one of the instance origins or redirect hosts (webhook_endpoint_off_origin, unless it is marked external), a first-party client without a back-channel logout URI (oauth_client_no_backchannel_logout_uri), and the security posture group (group: security_posture — pkce_not_required, passkey_without_uv, auto_link_unverified) — each with a severity, a stable code, a plain message and the fix. A finding that does not apply to how the instance integrates (the embedded-component checks on an origin Atlas is confident signs in through the hosted redirect) is listed under suppressed with the reason, not in findings; integrations shows how each allowed origin was judged. ok is true when there are no errors. ok covers configuration; to confirm a browser can sign in on a given origin, use GET /v1/diagnostics/login_readiness?origin=… for each production origin. Every code is listed by GET /v1/instance/preflight/codes. A warning or info finding you have acknowledged (PUT /v1/instance/preflight/acks/{code}) is still listed, with acknowledged: { reason, by, at, expires_at }; count only the findings without it. Errors are never acknowledged. Read-only.\n**Required scope:** `diagnostics:read`\n\n`GET /v1/instance/preflight`"
               },
               "response": []
             },
@@ -19998,6 +20026,41 @@
                   ]
                 },
                 "description": "Every identity integration: the four presets (chatly, forumulate, cookiemunch, referalli; connected or not) and every custom integration, each with its health — last mint, mints and reported verify errors in the last 24 hours, the last verify error, and the event and back-channel logout receivers (state, failing_since, consecutive failures, 24-hour success rate).\n**Required scope:** `instance:read`\n\n`GET /v1/instance/integrations`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET Every preflight acknowledgement on the instance, lapsed ones included (active: false). An acknowledgement marks ever",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/preflight/acks?limit=0&starting_after=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "preflight",
+                    "acks"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "0",
+                      "disabled": true,
+                      "description": "Page size, 1-500. Without limit (and without starting_after) the whole list is returned."
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "Cursor: return only items after this one. Pass the previous page's `next_cursor` (the last item's id). An unknown cursor is a 400."
+                    }
+                  ]
+                },
+                "description": "Every preflight acknowledgement on the instance, lapsed ones included (active: false). An acknowledgement marks every finding with its code as known and accepted.\n**Required scope:** `diagnostics:read`\n\n`GET /v1/instance/preflight/acks`"
               },
               "response": []
             },
@@ -20358,7 +20421,7 @@
                       "key": "status",
                       "value": "ok",
                       "disabled": true,
-                      "description": "`failed` = anything but ok."
+                      "description": "`failed` = timeout, error or invalid_response (not ok, not denied)."
                     },
                     {
                       "key": "test",
@@ -21118,7 +21181,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"enabled\": false,\n  \"url\": \"string\",\n  \"signing_secret\": \"string\",\n  \"timeout_ms\": 0\n}",
+                  "raw": "{\n  \"enabled\": false,\n  \"url\": \"string\",\n  \"signing_secret\": \"string\",\n  \"timeout_ms\": 0,\n  \"fail_closed\": false\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -21137,7 +21200,7 @@
                     "before_user_create"
                   ]
                 },
-                "description": "Update the before_user_create hook. Only the fields you send change; null clears. The hook is called (signed like a webhook) after the user id is assigned and before user.created, the referral call and any session. It may answer {external_id, public_metadata, private_metadata, unsafe_metadata}. A slow or failing hook never blocks the sign-up.\n**Required scope:** `instance:write`\n\n`PATCH /v1/instance/hooks/before_user_create`"
+                "description": "Update the before_user_create hook. Only the fields you send change; null clears. The hook is called (signed like a webhook) after the user id is assigned and before user.created, the referral call and any session. It may answer {external_id, public_metadata, private_metadata, unsafe_metadata}, or deny the sign-up with {\"deny\": true, \"reason\": \"...\"} or HTTP 403: the person gets 403 SIGN_UP_DENIED with your reason, no user is kept and no user.created is sent. A slow or failing hook does not block the sign-up unless fail_closed is true.\n**Required scope:** `instance:write`\n\n`PATCH /v1/instance/hooks/before_user_create`"
               },
               "response": []
             },
@@ -22091,6 +22154,48 @@
               "response": []
             },
             {
+              "name": "PUT Acknowledge a preflight finding you know about and accept, with a reason: GET /v1/instance/preflight still lists eve",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"string\",\n  \"expires_at\": 0\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/preflight/acks/:code",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "preflight",
+                    "acks",
+                    ":code"
+                  ],
+                  "variable": [
+                    {
+                      "key": "code",
+                      "value": "code"
+                    }
+                  ]
+                },
+                "description": "Acknowledge a preflight finding you know about and accept, with a reason: GET /v1/instance/preflight still lists every finding with this code, marked acknowledged: { reason, by, at, expires_at }, and it no longer counts as something to fix (the dashboard and atlas preflight --fail-on warning skip it). Replaces any earlier acknowledgement of the code. expires_at (epoch ms or ISO 8601, in the future; omit or null for no expiry) makes it lapse, after which the finding counts again. A code that can be an error-severity finding is refused with 422 VALIDATION_FAILED (param code, meta.reason error_severity_not_acknowledgeable): errors are fixed, never acknowledged. An unknown code is 400. Each change is a config-changelog entry (preflight_ack.saved). dry_run=true validates without saving.\n**Required scope:** `instance:write`\n\n`PUT /v1/instance/preflight/acks/{code}`"
+              },
+              "response": []
+            },
+            {
               "name": "PUT Bring your own key: keep the signing key in AWS KMS, Google Cloud KMS or Azure Key Vault. Atlas validates the settin",
               "request": {
                 "method": "PUT",
@@ -22195,7 +22300,7 @@
                     }
                   ]
                 },
-                "description": "Connect (or replace) an identity integration: any service that verifies a user with a JWT. getToken({ for: '<id>' }) then mints a token of at most 120 s with aud = audience, sub (the Atlas user id), ext (external_id), principal (the branding audience the user signed in under), sid, email, email_verified, name and locale, verifiable against the instance JWKS. Atlas also delivers user.updated / user.banned / user.unbanned / user.deleted / session.revoked to events_url and an OIDC Back-Channel Logout token to backchannel_logout_url on every session end. ?dry_run=true validates in full and answers { object: 'dry_run', changes, would_return } without saving. Also accepts metadata tags and external_ref. The integration id: a preset (chatly, forumulate, cookiemunch, referalli) or a custom integration id (2-40 lowercase letters, digits, \"_\" or \"-\", starting with a letter).\n**Required scope:** `instance:write`\n\n`PUT /v1/instance/integrations/{product}`"
+                "description": "Connect (or replace) an identity integration: any service that verifies a user with a JWT. getToken({ for: '<id>' }) then mints a token of at most 120 s with aud = audience, sub (the Atlas user id), ext (external_id), principal (the branding audience the user signed in under), sid, email, email_verified, name and locale, verifiable against the instance JWKS. Atlas also delivers user.updated / user.banned / user.unbanned / user.deleted / session.revoked to events_url and an OIDC Back-Channel Logout token to backchannel_logout_url on every session end. ?dry_run=true validates in full and answers { object: 'dry_run', changes, would_return } without saving. Also accepts metadata tags and external_ref. The OAuth client the service signs users in with (oauth_client_id, else the client tagged product=<integration id>) gets its https redirect-URI origins added to allowed_origins (append only, recorded in the config changelog); the response lists them in added_origins. The integration id: a preset (chatly, forumulate, cookiemunch, referalli) or a custom integration id (2-40 lowercase letters, digits, \"_\" or \"-\", starting with a letter).\n**Required scope:** `instance:write`\n\n`PUT /v1/instance/integrations/{product}`"
               },
               "response": []
             },
@@ -22558,7 +22663,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"secret\": \"string\",\n  \"provider\": \"string\"\n}",
+                  "raw": "{\n  \"secret\": \"string\",\n  \"provider\": \"string\",\n  \"site_key\": \"string\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -22576,7 +22681,7 @@
                     "captcha_secret"
                   ]
                 },
-                "description": "Store a captcha provider secret (write-only, encrypted; never read back). Captcha always runs on your own provider keys, so store the secret first: `provider` names the provider it belongs to (default: the configured auth_config.captcha.provider), so it can be stored before the captcha is turned on. Without a provider in the body or the config, the call is refused.\n**Required scope:** `instance:write`\n\n`PUT /v1/instance/captcha_secret`"
+                "description": "Store a captcha provider secret (write-only, encrypted; never read back). Captcha always runs on your own provider keys, so store the secret first: `provider` names the provider it belongs to (default: the configured auth_config.captcha.provider), so it can be stored before the captcha is turned on. Without a provider in the body or the config, the call is refused. Key-only switch: send `site_key` too and the same call sets auth_config.captcha.provider and siteKey in one atomic write, so moving from the built-in atlas captcha to Turnstile is { provider: \"turnstile\", secret, site_key } (the same CAPTCHA_KEYS_REQUIRED and validation checks as PATCH /v1/instance apply; `switched: true` and the stored `captcha` come back). Flows or actions that name their own provider keep it. The two-step path (this call, then PATCH /v1/instance) still works.\n**Required scope:** `instance:write`\n\n`PUT /v1/instance/captcha_secret`"
               },
               "response": []
             },
@@ -22894,7 +22999,7 @@
               "response": []
             },
             {
-              "name": "POST Bulk-create instance invitations (≤100). Per-entry validation/dedup; returns created + errors.",
+              "name": "POST Bulk-create instance invitations (≤100). Each entry takes email_address, public_metadata, expires_at or expires_in_",
               "request": {
                 "method": "POST",
                 "header": [
@@ -22905,7 +23010,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"invitations\": [\n    {\n      \"email_address\": \"string\",\n      \"public_metadata\": {}\n    }\n  ]\n}",
+                  "raw": "{\n  \"invitations\": [\n    {\n      \"email_address\": \"string\",\n      \"public_metadata\": {},\n      \"expires_at\": 0,\n      \"expires_in_days\": 0\n    }\n  ]\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -22923,12 +23028,12 @@
                     "bulk"
                   ]
                 },
-                "description": "Bulk-create instance invitations (≤100). Per-entry validation/dedup; returns created + errors.\n**Required scope:** `invitations:write`\n\n`POST /v1/invitations/bulk`"
+                "description": "Bulk-create instance invitations (≤100). Each entry takes email_address, public_metadata, expires_at or expires_in_days as on POST /v1/invitations. Per-entry validation/dedup; returns created + errors. Fires invitation.created per created entry.\n**Required scope:** `invitations:write`\n\n`POST /v1/invitations/bulk`"
               },
               "response": []
             },
             {
-              "name": "POST Create an instance-level invitation. On matching-email sign-up its public_metadata is copied onto the new user. Exp",
+              "name": "POST Create an instance-level invitation (no email is sent). On matching-email sign-up, once the address is proven, it i",
               "request": {
                 "method": "POST",
                 "header": [
@@ -22939,7 +23044,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"email_address\": \"string\",\n  \"public_metadata\": {}\n}",
+                  "raw": "{\n  \"email_address\": \"string\",\n  \"public_metadata\": {},\n  \"expires_at\": 0,\n  \"expires_in_days\": 0\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -22956,12 +23061,12 @@
                     "invitations"
                   ]
                 },
-                "description": "Create an instance-level invitation. On matching-email sign-up its public_metadata is copied onto the new user. Expires in 7 days.\n**Required scope:** `invitations:write`\n\n`POST /v1/invitations`"
+                "description": "Create an instance-level invitation (no email is sent). On matching-email sign-up, once the address is proven, it is accepted, its public_metadata is copied onto the new user and invitation.accepted fires. While pending and unexpired it also admits that exact address when the sign-up mode is restricted (invite-only), so your product can share its own allowlist with Atlas. Expires in 7 days unless you send expires_at (epoch ms or ISO 8601, at most 365 days ahead) or expires_in_days (1-365), not both. Fires invitation.created.\n**Required scope:** `invitations:write`\n\n`POST /v1/invitations`"
               },
               "response": []
             },
             {
-              "name": "POST Revoke a pending instance invitation so it can no longer be accepted.",
+              "name": "POST Revoke a pending instance invitation so it can no longer be accepted and no longer admits its address in restricted",
               "request": {
                 "method": "POST",
                 "header": [],
@@ -22983,7 +23088,7 @@
                     }
                   ]
                 },
-                "description": "Revoke a pending instance invitation so it can no longer be accepted.\n**Required scope:** `invitations:write`\n\n`POST /v1/invitations/{id}/revoke`"
+                "description": "Revoke a pending instance invitation so it can no longer be accepted and no longer admits its address in restricted sign-up mode. Fires invitation.revoked.\n**Required scope:** `invitations:write`\n\n`POST /v1/invitations/{id}/revoke`"
               },
               "response": []
             }
@@ -27150,7 +27255,7 @@
                     }
                   ]
                 },
-                "description": "Send a clearly-marked test message to a destination to verify the configured email or SMS provider delivers, without triggering a real auth flow. Rate-limited; 422 when nothing is configured.\n**Required scope:** `messaging:write`\n\n`POST /v1/messaging_providers/{channel}/test`"
+                "description": "Send a clearly-marked test message to a destination to verify the configured email or SMS provider delivers, without triggering a real auth flow. Rate-limited; 422 when nothing is configured. 200 when the provider accepted the message: `ok`/`accepted` true, `provider`, `provider_message_id` (for SMTP also `provider_response`, the server reply line with its queue id). 502 INTERNAL when the provider refused it or could not be reached; the error `meta` carries `ok: false`, `accepted: false`, `failure` (provider_rejected | provider_unreachable), `provider`, `provider_message_id`, `provider_status`, `provider_reason` (the provider's own reason) and, for SMTP, `provider_response`.\n**Required scope:** `messaging:write`\n\n`POST /v1/messaging_providers/{channel}/test`"
               },
               "response": []
             },
@@ -29386,7 +29491,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"string\",\n  \"redirect_uris\": [\n    \"string\"\n  ],\n  \"allowed_scopes\": [\n    \"string\"\n  ],\n  \"grant_types\": [\n    \"string\"\n  ],\n  \"token_endpoint_auth_method\": \"client_secret_basic\",\n  \"logo_url\": \"string\",\n  \"first_party\": false,\n  \"post_logout_redirect_uris\": [\n    \"string\"\n  ],\n  \"claims_redirect_uris\": [\n    \"string\"\n  ],\n  \"backchannel_logout_uri\": \"string\",\n  \"backchannel_logout_session_required\": false,\n  \"frontchannel_logout_uri\": \"string\",\n  \"frontchannel_logout_session_required\": false,\n  \"skip_logout_confirmation\": false,\n  \"login_url\": \"string\",\n  \"consent_url\": \"string\",\n  \"secret_expires_in_seconds\": 0,\n  \"subject_type\": \"public\",\n  \"sector_identifier_uri\": \"string\",\n  \"access_token_format\": \"jwt\",\n  \"token_lifetimes\": {\n    \"access_token_ttl_seconds\": 0,\n    \"id_token_ttl_seconds\": 0,\n    \"refresh_token_absolute_ttl_seconds\": 0,\n    \"refresh_token_idle_ttl_seconds\": 0,\n    \"authorization_code_ttl_seconds\": 0,\n    \"device_code_ttl_seconds\": 0\n  },\n  \"disabled\": false,\n  \"require_pkce\": false\n}",
+                  "raw": "{\n  \"name\": \"string\",\n  \"redirect_uris\": [\n    \"string\"\n  ],\n  \"allowed_scopes\": [\n    \"string\"\n  ],\n  \"grant_types\": [\n    \"string\"\n  ],\n  \"token_endpoint_auth_method\": \"client_secret_basic\",\n  \"logo_url\": \"string\",\n  \"first_party\": false,\n  \"post_logout_redirect_uris\": [\n    \"string\"\n  ],\n  \"claims_redirect_uris\": [\n    \"string\"\n  ],\n  \"add_redirect_origins\": false,\n  \"backchannel_logout_uri\": \"string\",\n  \"backchannel_logout_session_required\": false,\n  \"frontchannel_logout_uri\": \"string\",\n  \"frontchannel_logout_session_required\": false,\n  \"skip_logout_confirmation\": false,\n  \"refresh_touches_session\": false,\n  \"require_verified_email\": false,\n  \"login_url\": \"string\",\n  \"consent_url\": \"string\",\n  \"secret_expires_in_seconds\": 0,\n  \"subject_type\": \"public\",\n  \"sector_identifier_uri\": \"string\",\n  \"access_token_format\": \"jwt\",\n  \"token_lifetimes\": {\n    \"access_token_ttl_seconds\": 0,\n    \"id_token_ttl_seconds\": 0,\n    \"refresh_token_absolute_ttl_seconds\": 0,\n    \"refresh_token_idle_ttl_seconds\": 0,\n    \"authorization_code_ttl_seconds\": 0,\n    \"device_code_ttl_seconds\": 0\n  },\n  \"disabled\": false,\n  \"require_pkce\": false\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -29410,7 +29515,7 @@
                     }
                   ]
                 },
-                "description": "Update an OAuth client's registration (name, redirect_uris, scopes). The secret is immutable here. Accepts `metadata` (replaces the provisioning tags).\n**Required scope:** `oauth_clients:write`\n\n`PATCH /v1/oauth_clients/{id}`"
+                "description": "Update an OAuth client's registration (name, redirect_uris, scopes). The secret is immutable here. Accepts `metadata` (replaces the provisioning tags) and `add_redirect_origins` (adds the redirect URIs' origins to allowed_origins, append only; listed in added_origins, automatic for an integration's sign-in client).\n**Required scope:** `oauth_clients:write`\n\n`PATCH /v1/oauth_clients/{id}`"
               },
               "response": []
             },
@@ -29531,7 +29636,7 @@
               "response": []
             },
             {
-              "name": "POST Register an OAuth client (confidential or public PKCE). A confidential client's secret is revealed exactly once. Id",
+              "name": "POST Register an OAuth client (confidential or public PKCE). A confidential client's secret is in the response; a genera",
               "request": {
                 "method": "POST",
                 "header": [
@@ -29559,12 +29664,12 @@
                     "oauth_clients"
                   ]
                 },
-                "description": "Register an OAuth client (confidential or public PKCE). A confidential client's secret is revealed exactly once. Idempotent create: `external_ref` returns the existing object on a repeat (200, `idempotent_replay: true`, no secret re-shown); `metadata` tags it (filter lists with ?metadata[key]=value).\n**Required scope:** `oauth_clients:write`\n\n`POST /v1/oauth_clients`"
+                "description": "Register an OAuth client (confidential or public PKCE). A confidential client's secret is in the response; a generated one can be fetched once more within 10 minutes with POST /v1/oauth_clients/{id}/secret/reveal (`client_secret_reveal` gives the path and deadline). Send `client_secret` to choose the secret yourself (32-256 random printable characters), so a provisioning script can re-run safely. `require_verified_email: true` makes /oauth2/authorize refuse users whose primary email is not verified. Idempotent create: `external_ref` returns the existing object on a repeat (200, `idempotent_replay: true`, no secret re-shown); `metadata` tags it (filter lists with ?metadata[key]=value). `add_redirect_origins: true` also adds the redirect URIs' origins to allowed_origins (append only; listed in added_origins); a client that a connected integration signs users in with (its oauth_client_id, or tagged metadata product=<integration id>) gets them automatically.\n**Required scope:** `oauth_clients:write`\n\n`POST /v1/oauth_clients`"
               },
               "response": []
             },
             {
-              "name": "POST Rotate a confidential client's secret; the new one is revealed exactly once. The previous secret keeps working for ",
+              "name": "POST Rotate a confidential client's secret; the new one is in the response and can be fetched once more within 10 minute",
               "request": {
                 "method": "POST",
                 "header": [
@@ -29600,7 +29705,7 @@
                     }
                   ]
                 },
-                "description": "Rotate a confidential client's secret; the new one is revealed exactly once. The previous secret keeps working for `overlap_seconds` (default 86400 = 24 hours, at most 604800 = 7 days) so you can deploy the new one without downtime; pass `overlap_seconds: 0` to revoke it now (for example after a leak). `previous_secret_expires_at` says when the old secret stops working (epoch ms), or null when it already has. 409 for a public client.\n**Required scope:** `oauth_clients:write`\n\n`POST /v1/oauth_clients/{id}/rotate_secret`"
+                "description": "Rotate a confidential client's secret; the new one is in the response and can be fetched once more within 10 minutes with POST /v1/oauth_clients/{id}/secret/reveal. The previous secret keeps working for `overlap_seconds` (default 86400 = 24 hours, at most 604800 = 7 days) so you can deploy the new one without downtime; pass `overlap_seconds: 0` to revoke it now (for example after a leak). `previous_secret_expires_at` says when the old secret stops working (epoch ms), or null when it already has. 409 for a public client.\n**Required scope:** `oauth_clients:write`\n\n`POST /v1/oauth_clients/{id}/rotate_secret`"
               },
               "response": []
             },
@@ -29629,6 +29734,75 @@
                   ]
                 },
                 "description": "Send a test back-channel logout now: a correctly signed logout_token for a synthetic session (sid `sid_test_…`) with the extra claim `atlas_test: true`. Returns the receiver's status, latency_ms, location (for a 3xx, which is not followed), error and a short body_excerpt, and records the attempt in the delivery log (test: true, never retried). 409 when the client has no backchannel_logout_uri.\n**Required scope:** `oauth_clients:write`\n\n`POST /v1/oauth_clients/{id}/backchannel_logout/test`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Show a confidential client's secret once more: for a script that crashed between the create (or rotate) response an",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/oauth_clients/:id/secret/reveal",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "oauth_clients",
+                    ":id",
+                    "secret",
+                    "reveal"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Show a confidential client's secret once more: for a script that crashed between the create (or rotate) response and saving the secret. Works once, within 10 minutes of the POST /v1/oauth_clients or POST /v1/oauth_clients/{id}/rotate_secret that generated it, and only while that secret is still the client's current one. The secret is kept encrypted for that window only and is cleared by this call, so a second call, a call after the window, a secret you chose yourself, or one rotated away since is 410 and the answer is to rotate. Audited (oauth_client.secret_revealed / oauth_client.secret_reveal_refused). An operator token needs a recent MFA. With `?dry_run=true` nothing is consumed: the response says whether the reveal is still available and until when. Unknown client is 404.\n**Required scope:** `oauth_clients:write`\n\n`POST /v1/oauth_clients/{id}/secret/reveal`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Sign a user out of this app and of Atlas in one server-side call. The path takes the client id (`oac_...`) or its p",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sid\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/oauth_clients/:id/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "oauth_clients",
+                    ":id",
+                    "logout"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Sign a user out of this app and of Atlas in one server-side call. The path takes the client id (`oac_...`) or its public `client_id`. Body `sid` = the `sid` claim of the id_token Atlas issued to this client. Revokes every refresh grant this client holds under the sid (offline_access included) and forgets its ID-token-only sign-in; revokes the Atlas session itself exactly like POST /v1/sessions/{id}/revoke (session.revoked webhook, back-channel logout to every other app signed in through it); and sends this client a back-channel logout so its other servers hear it. Afterwards the Atlas cookie in the browser points at a dead session, so no redirect to /oauth2/logout is needed (it remains available when you want a post_logout_redirect_uri). Needs BOTH `oauth_clients:write` and `sessions:write` on the key. 404 when the client or the session is not in this instance; 403 when that session never signed in to this client (use POST /v1/sessions/{id}/revoke for any session). A session that had already ended answers `session: \"already_ended\"` and still has the grants of this client under it revoked. Supports `?dry_run=true`.\n**Required scope:** `oauth_clients:write`\n\n`POST /v1/oauth_clients/{id}/logout`"
               },
               "response": []
             },
@@ -43929,7 +44103,7 @@
                     "user_imports"
                   ]
                 },
-                "description": "Bulk-create users from an array, deduping by verified email, through the same path sign-up uses. Plaintext passwords are Argon2id-hashed; Argon2id, bcrypt, PBKDF2/scrypt (Django, passlib), Firebase scrypt (with password_hash_config.firebase) and Better Auth scrypt hashes are imported verbatim. A hash that does not describe itself is imported by naming it: password_hash_algorithm (scrypt, pbkdf2, md5, sha1, sha256, sha512, their _salted forms, hmac_sha256, bcrypt, …) with password_hash_params (scrypt n or log_n / r / p / key_length; pbkdf2 digest / iterations / key_length; md5 and sha* salt_position prefix|suffix; encoding and salt_encoding hex|base64|base64url|utf8) and password_salt; the hash may be the bare digest or `<salt>$<hash>` / `<name>$<salt>$<hash>` (e.g. `scrypt$<salt>$<hash>` with the parameters given separately). Every imported hash is checked with a constant-time compare and upgraded to Argon2id on the first successful sign-in; a format that cannot be checked is rejected per row (unsupported_password_hash, the message names the field). Each row may also carry external_id, image_url (alias profile_image_url: an https URL; an invalid one fails the row with invalid_image_url), created_at, phone_number / phone_numbers and organization_memberships (org by id, external id or slug, plus a role); create_organizations:true creates a missing org. Per-row failures are recorded, never fatal. Body: an array of users, or { users, upsert?, notify?, create_organizations?, password_hash_config? }. An import never notifies the imported users: with notify false (the default) no email, SMS or push is sent as a consequence of the import, whatever templates are configured; notify:true is reserved for future welcome messages and currently sends nothing.\n**Required scope:** `jobs:write`\n\n`POST /v1/user_imports`"
+                "description": "Bulk-create users from an array, deduping by verified email, through the same path sign-up uses. Plaintext passwords are Argon2id-hashed; Argon2id, bcrypt, PBKDF2/scrypt (Django, passlib), Firebase scrypt (with password_hash_config.firebase), Better Auth scrypt and Node crypto.scrypt `scrypt$N$r$p$salt$key` hashes are imported verbatim (a Node string with an all-digit salt is also a valid Django one and must be named: password_hash_algorithm scrypt_node or scrypt_django; scrypt_node takes salt_encoding, default utf8 = the salt text as written). A hash that does not describe itself is imported by naming it: password_hash_algorithm (scrypt, pbkdf2, md5, sha1, sha256, sha512, their _salted forms, hmac_sha256, bcrypt, …) with password_hash_params (scrypt n or log_n / r / p / key_length; pbkdf2 digest / iterations / key_length; md5 and sha* salt_position prefix|suffix; encoding and salt_encoding hex|base64|base64url|utf8) and password_salt; the hash may be the bare digest or `<salt>$<hash>` / `<name>$<salt>$<hash>` (e.g. `scrypt$<salt>$<hash>` with the parameters given separately). Every imported hash is checked with a constant-time compare and upgraded to Argon2id on the first successful sign-in; a format that cannot be checked is rejected per row (unsupported_password_hash, the message names the field). Each row may also carry external_id, image_url (alias profile_image_url: an https URL; an invalid one fails the row with invalid_image_url), created_at, phone_number / phone_numbers and organization_memberships (org by id, external id or slug, plus a role); create_organizations:true creates a missing org. Per-row failures are recorded, never fatal. Body: an array of users, or { users, upsert?, notify?, create_organizations?, password_hash_config? }. An import never notifies the imported users: with notify false (the default) no email, SMS or push is sent as a consequence of the import, whatever templates are configured; notify:true is reserved for future welcome messages and currently sends nothing.\n**Required scope:** `jobs:write`\n\n`POST /v1/user_imports`"
               },
               "response": []
             }
@@ -46222,7 +46396,7 @@
                     "users"
                   ]
                 },
-                "description": "Create a user from an email and optional password (plaintext `password`, Argon2id-hashed; or an existing hash: `password_hash`, alias `password_digest`. A self-describing hash (Argon2id, bcrypt, Django / passlib PBKDF2 and scrypt, Firebase scrypt, phpass, LDAP {SSHA}) is stored as given; any other is named with `password_hash_algorithm` (scrypt, pbkdf2, md5, sha1, sha256, sha512, hmac_sha256, …) plus `password_hash_params` (e.g. scrypt { n, r, p, key_length, salt_encoding }) and `password_salt`, or as `<name>$<salt>$<hash>`; `password_hasher` is the Clerk name, used only when the hash does not describe itself. An imported hash is upgraded to Argon2id on the first successful sign-in; one Atlas cannot check is a 400 naming the field), name, profile picture (image_url, alias profile_image_url: an https URL stored as given) and metadata. Emits user.created (a webhook to your endpoints). Never notifies the user: with notify false (the default) no email, SMS or push is sent as a consequence of the create, whatever templates are configured — not even a verification code. notify:true is reserved for future welcome messages and currently sends nothing. A backend create is never reported to the referral platform unless the body carries a `referral` object ({ code, click_id, anon_id }: an imported referral); `referral_code` sets the user's own code (unique, 409 REFERRAL_CODE_TAKEN).\n**Required scope:** `users:write`\n\n`POST /v1/users`"
+                "description": "Create a user from an email and optional password (plaintext `password`, Argon2id-hashed; or an existing hash: `password_hash`, alias `password_digest`. A self-describing hash (Argon2id, bcrypt, Django / passlib PBKDF2 and scrypt, Node `scrypt$N$r$p$salt$key`, Firebase scrypt, phpass, LDAP {SSHA}) is stored as given (a Node scrypt string whose salt is all digits is also a valid Django one: 400 until you name `scrypt_node` or `scrypt_django`); any other is named with `password_hash_algorithm` (scrypt, pbkdf2, md5, sha1, sha256, sha512, hmac_sha256, …) plus `password_hash_params` (e.g. scrypt { n, r, p, key_length, salt_encoding }) and `password_salt`, or as `<name>$<salt>$<hash>`; `password_hasher` is the Clerk name, used only when the hash does not describe itself. An imported hash is upgraded to Argon2id on the first successful sign-in; one Atlas cannot check is a 400 naming the field), name, profile picture (image_url, alias profile_image_url: an https URL stored as given) and metadata. Emits user.created (a webhook to your endpoints). Never notifies the user: with notify false (the default) no email, SMS or push is sent as a consequence of the create, whatever templates are configured — not even a verification code. notify:true is reserved for future welcome messages and currently sends nothing. A backend create is never reported to the referral platform unless the body carries a `referral` object ({ code, click_id, anon_id }: an imported referral); `referral_code` sets the user's own code (unique, 409 REFERRAL_CODE_TAKEN).\n**Required scope:** `users:write`\n\n`POST /v1/users`"
               },
               "response": []
             },
@@ -48835,7 +49009,7 @@
                     }
                   ]
                 },
-                "description": "Send a synthetic webhook.test event to this endpoint only (never fanned out), also when the endpoint is switched off (active: false). It is signed exactly like a real delivery, with the endpoint's own signing secret (both secrets during a rotation overlap). With ?wait=10s the attempt is made now and the result returned (200): delivery_id, event_id, event_type (webhook.test), status (success | failed), http_status, latency_ms, response_snippet (first 1 KB), error (the delivery-log code), error_kind (non_2xx, redirect, timeout, tls, dns, connection_refused, network, url_blocked; null on success), signature_header_sent and will_retry. Without it the delivery is queued (201).\n**Required scope:** `webhooks:write`\n\n`POST /v1/webhook_endpoints/{id}/test`"
+                "description": "Send a synthetic webhook.test event to this endpoint only (never fanned out), also when the endpoint is switched off (active: false). It is signed exactly like a real delivery, with the endpoint's own signing secret (both secrets during a rotation overlap). Two answers, by status: without ?wait the delivery is queued for the worker and the answer is 201 Created (object webhook_delivery: id, event_id, url, status pending); with ?wait=10s the attempt is made now and the answer is 200 OK with the result (object webhook_test_result): delivery_id, event_id, event_type (webhook.test), url (the exact URL tried), status (success | failed), http_status, latency_ms, response_snippet (first 1 KB of the response), error (the delivery-log code), error_kind (non_2xx, redirect, timeout, tls, dns, connection_refused, network, url_blocked; null on success), signature_header_sent and will_retry. A failed attempt is still 200: read status. Check for 2xx, not for 200.\n**Required scope:** `webhooks:write`\n\n`POST /v1/webhook_endpoints/{id}/test`"
               },
               "response": []
             },
@@ -65723,7 +65897,7 @@
                     "touch"
                   ]
                 },
-                "description": "Relying-party session touch. Client-authenticated like /oauth2/token (confidential clients only). Body `sid` = the id_token's `sid`. Slides THIS app's refresh grant(s) under that sid (idle deadline → now + 30 days, never past the absolute expiry). The Atlas session itself and other apps are not touched: Atlas ID sessions follow atlasauth.net's own policy, never your instance's idleMs. Another app's sid, or one with no live sign-in of this app, is 404.\n\n`POST /oauth2/session/touch`"
+                "description": "Relying-party session touch. Client-authenticated like /oauth2/token (confidential clients only). Body `sid` = the id_token's `sid`. Slides THIS app's refresh grant(s) under that sid (idle deadline → now + 30 days, never past the absolute expiry). The Atlas session itself and other apps are not touched: Atlas ID sessions follow atlasauth.net's own policy, never your instance's idleMs. Exception: a first-party client with `refresh_touches_session` on also slides the Atlas session (reported as `atlas_session`), and a sid whose Atlas session has ended is 404. Another app's sid, or one with no live sign-in of this app, is 404.\n\n`POST /oauth2/session/touch`"
               },
               "response": []
             }
@@ -67762,7 +67936,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/v1/platform/apps?tag=string&archived=false&include_archived=false&limit=0&starting_after=string",
+                  "raw": "{{baseUrl}}/v1/platform/apps?tag=string&archived=false&include_archived=false&name=string&name_prefix=string&external_ref=string&limit=0&starting_after=string",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -67791,6 +67965,24 @@
                       "description": "true (or 1) = list archived apps alongside active ones. By default only active apps are listed."
                     },
                     {
+                      "key": "name",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "Only apps with exactly this name, ignoring case."
+                    },
+                    {
+                      "key": "name_prefix",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "Only apps whose name starts with this text, ignoring case."
+                    },
+                    {
+                      "key": "external_ref",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "Only the app created with this external_ref (zero or one item)."
+                    },
+                    {
                       "key": "limit",
                       "value": "0",
                       "disabled": true,
@@ -67804,7 +67996,7 @@
                     }
                   ]
                 },
-                "description": "List the apps (instances) this platform owns. Never returns any secret. X8: archived apps are hidden by default — pass ?include_archived=true to include them, ?archived=true to show only archived, and ?tag=<t> to filter to apps carrying that tag. Filter with ?metadata[key]=value; each item carries `metadata` and `external_ref`.\n**Required scope:** `platform:apps:read`\n\n`GET /v1/platform/apps`"
+                "description": "List the apps (instances) this platform owns. Never returns any secret. X8: archived apps are hidden by default — pass ?include_archived=true to include them, ?archived=true to show only archived, and ?tag=<t> to filter to apps carrying that tag. Find one app with ?name=<n> (exact, ignoring case), ?name_prefix=<p> or ?external_ref=<ref> (the ref given at create; at most one item). Filter with ?metadata[key]=value; each item carries `metadata` and `external_ref`. Newest first. Without `limit` every matching app is returned (has_more false); pass `limit` (up to 500) and `starting_after` = the previous page's `next_cursor` to page.\n**Required scope:** `platform:apps:read`\n\n`GET /v1/platform/apps`"
               },
               "response": []
             },
