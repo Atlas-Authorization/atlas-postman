@@ -14108,7 +14108,7 @@
                     }
                   ]
                 },
-                "description": "Check the domain's CNAME now (a path mount: fetch its https verification file); a verified fapi host is written onto the instance. With DNS automation, a missing record is written again first.\n**Required scope:** `domains:write`\n\n`POST /v1/domains/{id}/verify`"
+                "description": "Check the domain's CNAME now (a path mount: fetch its https verification file); a verified fapi host is written onto the instance. With DNS automation, a missing record is written again first. ?dry_run=true changes nothing and checks no DNS record or file (validated: false): it answers what a passing verify would do to the issuer, as issuer_before, issuer_after (equal when the issuer would not move: the domain is already live, is not the instance's own fapi host, or is a platform subdomain) and previous_issuers_kept_until (Unix seconds; null when the issuer would not move).\n**Required scope:** `domains:write`\n\n`POST /v1/domains/{id}/verify`"
               },
               "response": []
             },
@@ -19387,6 +19387,27 @@
           "name": "instance",
           "item": [
             {
+              "name": "DELETE Cancel a staged rotation: the staged key leaves the JWKS and never signs. 404 when none is staged. Audited as sig",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/signing_keys/next",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "signing_keys",
+                    "next"
+                  ]
+                },
+                "description": "Cancel a staged rotation: the staged key leaves the JWKS and never signs. 404 when none is staged. Audited as signing_key.staged_canceled.\n**Required scope:** `instance:write`\n\n`DELETE /v1/instance/signing_keys/next`"
+              },
+              "response": []
+            },
+            {
               "name": "DELETE Clear a stored captcha provider secret (default: the configured provider). Refused with 409 CAPTCHA_IN_USE (meta.",
               "request": {
                 "method": "DELETE",
@@ -19776,6 +19797,27 @@
                   ]
                 },
                 "description": "Turn off the hosted-page cookie-consent CMP: no script is injected and the CSP goes back to normal.\n**Required scope:** `instance:write`\n\n`DELETE /v1/instance/cookie_consent`"
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE Turn the before_user_create hook off and clear its url and signing secret, the same as PATCH with {enabled:false,",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/hooks/before_user_create",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "hooks",
+                    "before_user_create"
+                  ]
+                },
+                "description": "Turn the before_user_create hook off and clear its url and signing secret, the same as PATCH with {enabled:false, url:null, signing_secret:null}. Audited. Idempotent: a hook that is already clear answers 200 the same way. timeout_ms and fail_closed are kept.\n**Required scope:** `instance:write`\n\n`DELETE /v1/instance/hooks/before_user_create`"
               },
               "response": []
             },
@@ -20778,6 +20820,26 @@
               "response": []
             },
             {
+              "name": "GET The staged-rotation policy: `prepublish_days` (null = off).",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/signing_key_policy",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "signing_key_policy"
+                  ]
+                },
+                "description": "The staged-rotation policy: `prepublish_days` (null = off).\n**Required scope:** `instance:read`\n\n`GET /v1/instance/signing_key_policy`"
+              },
+              "response": []
+            },
+            {
               "name": "GET The upstream status pages this instance depends on, each with its last known state, and the worst state of the enabl",
               "request": {
                 "method": "GET",
@@ -21089,6 +21151,40 @@
               "response": []
             },
             {
+              "name": "PATCH Set the staged-rotation policy. With `prepublish_days` (1..90) every ordinary rotation is staged that many days ah",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"prepublish_days\": 0\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/signing_key_policy",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "signing_key_policy"
+                  ]
+                },
+                "description": "Set the staged-rotation policy. With `prepublish_days` (1..90) every ordinary rotation is staged that many days ahead (its key published now, signing from then) unless the rotate call passes `staged: false`; null or 0 turns it off. Emergency rotations are never staged. Audited as signing_key.policy_updated.\n**Required scope:** `instance:write`\n\n`PATCH /v1/instance/signing_key_policy`"
+              },
+              "response": []
+            },
+            {
               "name": "PATCH Turn \"Sign in with Atlas\" on or off: the API for the dashboard toggle. enabled: true with connection_id links that",
               "request": {
                 "method": "PATCH",
@@ -21168,7 +21264,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"allowed_origins\": [\n    \"string\"\n  ],\n  \"auth_config\": {\n    \"accountLinking\": \"auto\",\n    \"accountLinkingTrust\": {},\n    \"accountUx\": {\n      \"deviceKeys\": {\n        \"enabled\": false,\n        \"satisfiesMfa\": false\n      },\n      \"emailChange\": {\n        \"requireOldAddressConfirm\": false\n      },\n      \"emailVerification\": \"both\",\n      \"impersonation\": {\n        \"notifyUser\": false\n      },\n      \"lastSignInMethod\": {\n        \"enabled\": false\n      },\n      \"passkeyAdoption\": {\n        \"endpoints\": {\n          \"enroll\": null,\n          \"manage\": null\n        },\n        \"prompt\": {\n          \"cooldownDays\": 0,\n          \"enabled\": false\n        },\n        \"recovery\": {\n          \"enabled\": false,\n          \"methods\": []\n        },\n        \"rollout\": {\n          \"deviceClasses\": [],\n          \"orgs\": {\n            \"allow\": null,\n            \"deny\": null\n          },\n          \"percentage\": 0,\n          \"variant\": \"string\"\n        },\n        \"signals\": false,\n        \"webauthn\": {\n          \"conditionalCreate\": false,\n          \"hints\": []\n        }\n      },\n      \"passkeySignUp\": {\n        \"email\": \"off\",\n        \"enabled\": false,\n        \"preferred\": false\n      },\n      \"passwordReset\": \"both\",\n      \"securityNotifications\": {\n        \"accountChanges\": false\n      },\n      \"username\": {\n        \"charset\": \"alphanumeric\",\n        \"maxLength\": 0,\n        \"minLength\": 0,\n        \"requiredAtSignUp\": false\n      }\n    },\n    \"appCatalog\": {\n      \"oidcApps\": [\n        {\n          \"allowedEmailDomains\": [],\n          \"assignment\": {\n            \"groups\": null,\n            \"mode\": null,\n            \"organizations\": null,\n            \"roles\": null,\n            \"userIds\": null\n          },\n          \"clientId\": \"string\",\n          \"id\": \"string\",\n          \"launchUrl\": \"string\",\n          \"name\": \"string\",\n          \"presetId\": \"string\"\n        }\n      ]\n    },\n    \"attackProtection\": {\n      \"appAttestation\": {\n        \"android\": {\n          \"packageNames\": [],\n          \"requireDeviceIntegrity\": false,\n          \"requirePlayRecognized\": false,\n          \"verificationKey\": \"string\"\n        },\n        \"enabled\": false,\n        \"flows\": {\n          \"signIn\": false,\n          \"signUp\": false,\n          \"smsSend\": false\n        },\n        \"ios\": {\n          \"allowDevelopment\": false,\n          \"appIds\": [],\n          \"deviceCheck\": {\n            \"enabled\": null,\n            \"keyId\": null,\n            \"sandbox\": null,\n            \"teamId\": null\n          }\n        },\n        \"maxAgeSeconds\": 0\n      },\n      \"bruteForce\": {\n        \"enabled\": false,\n        \"unblock\": \"email_link\"\n      },\n      \"countries\": {\n        \"blockUnknown\": false,\n        \"list\": [\n          \"string\"\n        ],\n        \"mode\": \"allow\",\n        \"signIn\": false,\n        \"signUp\": false\n      },\n      \"deviceAccounts\": {\n        \"enabled\": false,\n        \"maxAccounts\": 0,\n        \"windowDays\": 0\n      },\n      \"disposableEmail\": {\n        \"block\": false\n      },\n      \"dormantAccounts\": {\n        \"enabled\": false,\n        \"notifyUser\": false,\n        \"onNoFactor\": \"allow\",\n        \"requireMfa\": false,\n        \"thresholdDays\": 0\n      },\n      \"smsPumping\": {\n        \"allowedPrefixes\": [\n          \"string\"\n        ],\n        \"blockedPrefixes\": [\n          \"string\"\n        ],\n        \"enabled\": false,\n        \"maxPerHour\": 0\n      }\n    },\n    \"banBlocksIp\": false,\n    \"banBlocksReregistration\": false,\n    \"banIpBlockDays\": 0,\n    \"billing\": {\n      \"portalConfigurationId\": \"string\"\n    },\n    \"captcha\": {\n      \"actions\": {},\n      \"attestationUrl\": \"string\",\n      \"flows\": {},\n      \"gateAnonymous\": false,\n      \"minScore\": 0,\n      \"projectId\": \"string\",\n      \"provider\": \"akamai\",\n      \"siteKey\": \"string\",\n      \"verifyUrl\": \"string\",\n      \"widget\": \"invisible\"\n    },\n    \"compliance\": {\n      \"consents\": [\n        {\n          \"policy\": \"string\",\n          \"required\": false,\n          \"version\": \"string\"\n        }\n      ],\n      \"dataRegion\": \"string\",\n      \"minors\": {\n        \"birthdateTrait\": \"string\",\n        \"consentAges\": {},\n        \"consentTtlHours\": 0,\n        \"countryTrait\": \"string\",\n        \"defaultConsentAge\": 0,\n        \"enabled\": false,\n        \"minimumAge\": 0,\n        \"restriction\": \"flag\"\n      },\n      \"retention\": {\n        \"anonymousRetentionDays\": 0,\n        \"cancelDeletionOnSignIn\": false,\n        \"deletedUserGraceDays\": 0,\n        \"erasureGraceDays\": 0\n      }\n    },\n    \"dangerouslyReportSkippedEmailsAsVerified\": false,\n    \"endUserApiKeys\": {\n      \"allowedClaimNames\": [\n        \"string\"\n      ],\n      \"allowedScopes\": [\n        \"string\"\n      ],\n      \"allowOrganizationKeys\": false,\n      \"defaultExpiresInSeconds\": 0,\n      \"keyPrefix\": \"string\",\n      \"maxActiveKeysPerSubject\": 0,\n      \"maxExpiresInSeconds\": 0,\n      \"organizationPermission\": \"string\",\n      \"scopeImplications\": {},\n      \"selfServiceEnabled\": false\n    },\n    \"entitlements\": {\n      \"features\": [\n        {\n          \"key\": \"string\",\n          \"name\": \"string\"\n        }\n      ],\n      \"plans\": [\n        {\n          \"features\": [],\n          \"key\": \"string\",\n          \"name\": \"string\"\n        }\n      ]\n    },\n    \"externalJwt\": {\n      \"issuers\": [\n        {\n          \"audience\": \"string\",\n          \"emailClaim\": \"string\",\n          \"id\": \"string\",\n          \"issuer\": \"string\",\n          \"jwksUri\": \"string\"\n        }\n      ]\n    },\n    \"identityTraits\": {\n      \"audienceKey\": \"string\",\n      \"groups\": [\n        {\n          \"key\": \"string\",\n          \"label\": \"string\",\n          \"labels\": {}\n        }\n      ],\n      \"traits\": [\n        {\n          \"key\": \"string\",\n          \"type\": \"array\"\n        }\n      ]\n    },\n    \"jwtTemplates\": {},\n    \"jwtTemplateSettings\": {},\n    \"kerberos\": {\n      \"allowJitProvisioning\": false,\n      \"emailDomain\": \"string\",\n      \"principalHeader\": \"string\",\n      \"realm\": \"string\"\n    },\n    \"ldap\": {\n      \"connections\": [\n        {\n          \"attributes\": {\n            \"email\": null,\n            \"firstName\": null,\n            \"groups\": null,\n            \"lastName\": null,\n            \"username\": null\n          },\n          \"baseDN\": \"string\",\n          \"bindDN\": \"string\",\n          \"id\": \"string\",\n          \"requireConsentScreen\": false,\n          \"url\": \"string\",\n          \"userFilter\": \"string\"\n        }\n      ]\n    },\n    \"localization\": {\n      \"defaultLocale\": \"string\",\n      \"enabledLocales\": [\n        \"string\"\n      ]\n    },\n    \"mcpConnector\": {\n      \"allowedRedirectHosts\": [\n        \"string\"\n      ],\n      \"dynamicRegistration\": false,\n      \"enabled\": false,\n      \"exposedScopes\": [\n        \"email\"\n      ],\n      \"name\": \"string\"\n    },\n    \"mfa\": {\n      \"backupCodes\": {\n        \"count\": 0\n      },\n      \"duo\": {\n        \"apiHost\": \"string\",\n        \"clientId\": \"string\"\n      },\n      \"factors\": {\n        \"customChallenge\": false,\n        \"duo\": false,\n        \"emailCode\": false,\n        \"hotp\": false,\n        \"passkey\": false,\n        \"push\": false,\n        \"sms\": false,\n        \"totp\": false,\n        \"yubikey\": false\n      },\n      \"hotp\": {\n        \"algorithm\": \"SHA1\",\n        \"digits\": 6,\n        \"lookAhead\": 0\n      },\n      \"rememberDevice\": {\n        \"days\": 0,\n        \"enabled\": false\n      },\n      \"securityQuestions\": {\n        \"enabled\": false,\n        \"maxAttempts\": 0,\n        \"questions\": [\n          \"string\"\n        ]\n      },\n      \"smartCard\": {\n        \"certHeader\": \"string\",\n        \"enabled\": false,\n        \"fingerprintHeader\": \"string\",\n        \"mappingRules\": [\n          \"fingerprint\"\n        ],\n        \"satisfiesMfa\": false,\n        \"secretHeader\": \"string\",\n        \"subjectHeader\": \"string\",\n        \"verifyHeader\": \"string\"\n      },\n      \"totp\": {\n        \"algorithm\": \"SHA1\",\n        \"digits\": 6,\n        \"period\": 30\n      },\n      \"totpEnrollmentCodes\": 0,\n      \"yubikey\": {\n        \"apiUrls\": [\n          \"string\"\n        ],\n        \"clientId\": \"string\",\n        \"mode\": \"cloud\"\n      }\n    },\n    \"mfaPolicy\": \"off\",\n    \"nativeApps\": {\n      \"androidApps\": [\n        {\n          \"packageName\": \"string\",\n          \"sha256CertFingerprints\": []\n        }\n      ],\n      \"appleAppIds\": [\n        \"string\"\n      ]\n    },\n    \"oauthProvider\": {\n      \"accessTokenFormat\": \"jwt\",\n      \"advanced\": {\n        \"cibaPasswordFallback\": false,\n        \"clientAttestationIssuers\": [\n          {\n            \"issuer\": null,\n            \"jwks\": null,\n            \"jwksUri\": null\n          }\n        ],\n        \"federation\": {\n          \"authorityHints\": [],\n          \"automaticRegistration\": false,\n          \"enabled\": false,\n          \"explicitRegistration\": false,\n          \"maxChainDepth\": 0,\n          \"organizationName\": null,\n          \"statementTtlSeconds\": 0,\n          \"subordinates\": [],\n          \"trustAnchors\": []\n        },\n        \"mtlsEndpointHost\": \"string\",\n        \"nativeSso\": false,\n        \"requireSoftwareStatement\": false,\n        \"sessionManagement\": false,\n        \"softwareStatementIssuers\": [\n          {\n            \"issuer\": null,\n            \"jwks\": null,\n            \"jwksUri\": null\n          }\n        ],\n        \"spiffeTrustDomains\": [\n          {\n            \"bundleEndpoint\": null,\n            \"jwtAuthorities\": null,\n            \"trustDomain\": null,\n            \"x509Authorities\": null\n          }\n        ],\n        \"transactionTokens\": {\n          \"enabled\": false,\n          \"trustDomains\": [],\n          \"ttlSeconds\": 0\n        }\n      },\n      \"authorizationDetailsTypesSupported\": [\n        \"string\"\n      ],\n      \"clientIdMetadataDocuments\": {\n        \"allowedHosts\": [\n          \"string\"\n        ],\n        \"blockedHosts\": [\n          \"string\"\n        ],\n        \"enabled\": false,\n        \"trustedHosts\": [\n          \"string\"\n        ]\n      },\n      \"consentUrl\": \"string\",\n      \"customScopes\": [\n        {\n          \"claims\": [],\n          \"description\": \"string\",\n          \"name\": \"string\",\n          \"parameters\": []\n        }\n      ],\n      \"deviceApprovalRequiresStepUp\": false,\n      \"dynamicClientSecretTtlSeconds\": 0,\n      \"dynamicRegistration\": false,\n      \"loginUrl\": \"string\",\n      \"requireInitialAccessToken\": false,\n      \"requirePkce\": false,\n      \"requirePushedAuthorizationRequests\": false,\n      \"tokenClaims\": [\n        {\n          \"scope\": \"string\",\n          \"template\": \"string\",\n          \"tokens\": []\n        }\n      ],\n      \"tokenLifetimes\": {\n        \"accessTokenSeconds\": 0,\n        \"authorizationCodeSeconds\": 0,\n        \"deviceCodeSeconds\": 0,\n        \"idTokenSeconds\": 0,\n        \"refreshTokenAbsoluteSeconds\": 0,\n        \"refreshTokenIdleSeconds\": 0\n      },\n      \"umaEnabled\": false\n    },\n    \"organizations\": {\n      \"allowCustomRolesFromApp\": false,\n      \"allowDeletionFromApp\": false,\n      \"creatorRole\": \"string\",\n      \"defaultMaxAllowedMemberships\": 0,\n      \"inheritAncestorRoles\": false,\n      \"invitationTtlSeconds\": 0,\n      \"maxCustomRolesPerOrganization\": 0,\n      \"maxMembersPerTeam\": 0,\n      \"maxOrganizationsPerUser\": 0,\n      \"maxPendingInvitationsPerOrganization\": 0,\n      \"maxTeamsPerOrganization\": 0\n    },\n    \"passkeyPolicy\": {\n      \"attachment\": \"any\",\n      \"attestation\": \"direct\",\n      \"authenticatorAllowlist\": [\n        \"string\"\n      ],\n      \"authenticatorBlocklist\": [\n        \"string\"\n      ],\n      \"mds\": {\n        \"blockStatuses\": [\n          \"string\"\n        ],\n        \"enabled\": false,\n        \"enforceAtSignIn\": false\n      },\n      \"requireUserVerification\": false,\n      \"requireUserVerificationForFirstFactor\": false,\n      \"timeoutSeconds\": 0\n    },\n    \"passwordPolicy\": {\n      \"bannedPasswords\": [\n        \"string\"\n      ],\n      \"breachCheckOnSignIn\": \"off\",\n      \"checkBreaches\": false,\n      \"historyCount\": 0,\n      \"maxAgeDays\": 0,\n      \"maxLength\": 0,\n      \"minLength\": 0,\n      \"rejectCommonPasswords\": false,\n      \"rejectIdentifierSubstring\": false,\n      \"requireLowercase\": false,\n      \"requireNumber\": false,\n      \"requireSymbol\": false,\n      \"requireUppercase\": false\n    },\n    \"pca\": {\n      \"enabled\": false,\n      \"maxPlanNodes\": 0,\n      \"publicRateLimitPerMin\": 0\n    },\n    \"phoneChannels\": {\n      \"sms\": false,\n      \"voice\": false,\n      \"whatsapp\": false\n    },\n    \"qrSignIn\": {\n      \"enabled\": false,\n      \"matchCodeDigits\": 0,\n      \"ttlMinutes\": 0\n    },\n    \"rateLimit\": {\n      \"bapiPerMin\": 0,\n      \"fapiCreatePerMin\": 0,\n      \"fapiVerifyPerMin\": 0,\n      \"ldapPerIpPerMin\": 0,\n      \"ldapPerUserPerMin\": 0,\n      \"rules\": [\n        {\n          \"group\": \"account_changes\",\n          \"key\": \"instance\",\n          \"max\": 0,\n          \"windowSeconds\": 0\n        }\n      ]\n    },\n    \"requireEmailVerification\": false,\n    \"restrictions\": {\n      \"allowlistOnly\": false\n    },\n    \"riskBasedMfa\": {\n      \"baseline\": {\n        \"enabled\": false,\n        \"weight\": 0\n      },\n      \"enabled\": false,\n      \"fraud\": {\n        \"deviceRateLimit\": {\n          \"adaptive\": false,\n          \"enabled\": false,\n          \"perHour\": 0\n        },\n        \"rules\": [\n          {\n            \"action\": null,\n            \"conditions\": null,\n            \"enabled\": null,\n            \"id\": null,\n            \"name\": null,\n            \"reason\": null\n          }\n        ],\n        \"sanctionedCountries\": [\n          \"string\"\n        ]\n      },\n      \"levelActions\": {\n        \"high\": \"allow\",\n        \"medium\": \"allow\"\n      },\n      \"midSession\": {\n        \"action\": \"audit\",\n        \"enabled\": false\n      },\n      \"mode\": \"audit\",\n      \"onHighRiskNoFactor\": \"allow\",\n      \"reputation\": {\n        \"emailChecks\": false,\n        \"emailWeight\": 0,\n        \"flagAnonymizers\": false,\n        \"ipWeight\": 0,\n        \"minScore\": 0,\n        \"provider\": \"ipqs\"\n      },\n      \"signals\": {\n        \"dormantAccount\": false,\n        \"impossibleTravel\": false,\n        \"newDevice\": false,\n        \"newIp\": false,\n        \"newSubnet\": false,\n        \"velocity\": false\n      },\n      \"stepUpThreshold\": \"high\",\n      \"weights\": {\n        \"dormantAccount\": 0,\n        \"impossibleTravel\": 0,\n        \"newDevice\": 0,\n        \"newIp\": 0,\n        \"newSubnet\": 0,\n        \"velocity\": 0\n      }\n    },\n    \"samlIdp\": {\n      \"serviceProviders\": [\n        {\n          \"acsUrl\": \"string\",\n          \"entityId\": \"string\",\n          \"id\": \"string\"\n        }\n      ]\n    },\n    \"session\": {\n      \"absoluteMs\": 0,\n      \"audience\": \"string\",\n      \"crossSubdomainCookies\": false,\n      \"customData\": {\n        \"claim\": \"string\",\n        \"inToken\": false\n      },\n      \"idleMs\": 0,\n      \"idleReconcileAcrossOrgs\": false,\n      \"idleTimeout\": false,\n      \"includeEmailClaim\": false,\n      \"includeEndUserPoolClaim\": false,\n      \"includeOrgsClaim\": false,\n      \"jwtTtlSeconds\": 0,\n      \"maxConcurrentSessions\": 0,\n      \"multiSession\": false,\n      \"refreshRotation\": false,\n      \"rememberMe\": false,\n      \"revokeOnPasswordChange\": false,\n      \"tokenIncludedSettingsKeys\": [\n        \"string\"\n      ],\n      \"tokenStrategy\": \"refresh\"\n    },\n    \"signals\": {\n      \"rawCapture\": false,\n      \"retentionDays\": 0\n    },\n    \"signInAfterReset\": false,\n    \"signUpMode\": \"public\",\n    \"srp\": {\n      \"deviceTracking\": \"always\",\n      \"enabled\": false,\n      \"poolName\": \"string\"\n    },\n    \"stepUp\": {\n      \"enabled\": false,\n      \"windowMs\": 0\n    },\n    \"strategies\": {\n      \"anonymous\": false,\n      \"emailCode\": false,\n      \"emailLink\": false,\n      \"kerberos\": false,\n      \"oauthProviders\": [\n        \"string\"\n      ],\n      \"passkey\": false,\n      \"password\": false,\n      \"phoneCode\": false,\n      \"siwb\": false,\n      \"siwe\": false,\n      \"siwf\": false,\n      \"siws\": false,\n      \"username\": false\n    },\n    \"strictRequestBodies\": false,\n    \"verification\": {\n      \"emailCode\": {\n        \"charset\": \"alphanumeric\",\n        \"length\": 0,\n        \"maxAttempts\": 0,\n        \"resendCooldownSeconds\": 0,\n        \"resendHourlyLimit\": 0,\n        \"resendSameCode\": false,\n        \"ttlMinutes\": 0\n      },\n      \"magicLink\": {\n        \"resendCooldownSeconds\": 0,\n        \"resendHourlyLimit\": 0,\n        \"ttlMinutes\": 0\n      },\n      \"smsCode\": {\n        \"length\": 0,\n        \"maxAttempts\": 0,\n        \"resendCooldownSeconds\": 0,\n        \"resendHourlyLimit\": 0,\n        \"ttlMinutes\": 0\n      }\n    },\n    \"walletGating\": {\n      \"enabled\": false,\n      \"rpcUrls\": {},\n      \"rules\": [\n        {\n          \"action\": \"grant\",\n          \"chainId\": 0,\n          \"contract\": \"string\",\n          \"id\": \"string\",\n          \"label\": \"string\",\n          \"minBalance\": \"string\",\n          \"standard\": \"erc1155\",\n          \"tokenId\": \"string\"\n        }\n      ]\n    },\n    \"branding\": {\n      \"audiences\": {}\n    }\n  }\n}",
+                  "raw": "{\n  \"allowed_origins\": [\n    \"string\"\n  ],\n  \"auth_config\": {\n    \"accountLinking\": \"auto\",\n    \"accountLinkingTrust\": {},\n    \"accountUx\": {\n      \"deviceKeys\": {\n        \"enabled\": false,\n        \"satisfiesMfa\": false\n      },\n      \"emailChange\": {\n        \"requireOldAddressConfirm\": false\n      },\n      \"emailVerification\": \"both\",\n      \"impersonation\": {\n        \"notifyUser\": false\n      },\n      \"lastSignInMethod\": {\n        \"enabled\": false\n      },\n      \"passkeyAdoption\": {\n        \"endpoints\": {\n          \"enroll\": null,\n          \"manage\": null\n        },\n        \"prompt\": {\n          \"cooldownDays\": 0,\n          \"enabled\": false\n        },\n        \"recovery\": {\n          \"enabled\": false,\n          \"methods\": []\n        },\n        \"rollout\": {\n          \"deviceClasses\": [],\n          \"orgs\": {\n            \"allow\": null,\n            \"deny\": null\n          },\n          \"percentage\": 0,\n          \"variant\": \"string\"\n        },\n        \"signals\": false,\n        \"webauthn\": {\n          \"conditionalCreate\": false,\n          \"hints\": []\n        }\n      },\n      \"passkeySignUp\": {\n        \"email\": \"off\",\n        \"enabled\": false,\n        \"preferred\": false\n      },\n      \"passwordReset\": \"both\",\n      \"securityNotifications\": {\n        \"accountChanges\": false\n      },\n      \"username\": {\n        \"charset\": \"alphanumeric\",\n        \"maxLength\": 0,\n        \"minLength\": 0,\n        \"requiredAtSignUp\": false\n      }\n    },\n    \"appCatalog\": {\n      \"oidcApps\": [\n        {\n          \"allowedEmailDomains\": [],\n          \"assignment\": {\n            \"groups\": null,\n            \"mode\": null,\n            \"organizations\": null,\n            \"roles\": null,\n            \"userIds\": null\n          },\n          \"clientId\": \"string\",\n          \"id\": \"string\",\n          \"launchUrl\": \"string\",\n          \"name\": \"string\",\n          \"presetId\": \"string\"\n        }\n      ]\n    },\n    \"attackProtection\": {\n      \"appAttestation\": {\n        \"android\": {\n          \"packageNames\": [],\n          \"requireDeviceIntegrity\": false,\n          \"requirePlayRecognized\": false,\n          \"verificationKey\": \"string\"\n        },\n        \"enabled\": false,\n        \"flows\": {\n          \"signIn\": false,\n          \"signUp\": false,\n          \"smsSend\": false\n        },\n        \"ios\": {\n          \"allowDevelopment\": false,\n          \"appIds\": [],\n          \"deviceCheck\": {\n            \"enabled\": null,\n            \"keyId\": null,\n            \"sandbox\": null,\n            \"teamId\": null\n          }\n        },\n        \"maxAgeSeconds\": 0\n      },\n      \"bruteForce\": {\n        \"enabled\": false,\n        \"unblock\": \"email_link\"\n      },\n      \"countries\": {\n        \"blockUnknown\": false,\n        \"list\": [\n          \"string\"\n        ],\n        \"mode\": \"allow\",\n        \"signIn\": false,\n        \"signUp\": false\n      },\n      \"deviceAccounts\": {\n        \"enabled\": false,\n        \"maxAccounts\": 0,\n        \"windowDays\": 0\n      },\n      \"disposableEmail\": {\n        \"block\": false\n      },\n      \"dormantAccounts\": {\n        \"enabled\": false,\n        \"notifyUser\": false,\n        \"onNoFactor\": \"allow\",\n        \"requireMfa\": false,\n        \"thresholdDays\": 0\n      },\n      \"smsPumping\": {\n        \"allowedPrefixes\": [\n          \"string\"\n        ],\n        \"blockedPrefixes\": [\n          \"string\"\n        ],\n        \"enabled\": false,\n        \"maxPerHour\": 0\n      }\n    },\n    \"banBlocksIp\": false,\n    \"banBlocksReregistration\": false,\n    \"banIpBlockDays\": 0,\n    \"billing\": {\n      \"portalConfigurationId\": \"string\"\n    },\n    \"captcha\": {\n      \"actions\": {},\n      \"attestationUrl\": \"string\",\n      \"flows\": {},\n      \"gateAnonymous\": false,\n      \"minScore\": 0,\n      \"projectId\": \"string\",\n      \"provider\": \"akamai\",\n      \"siteKey\": \"string\",\n      \"verifyUrl\": \"string\",\n      \"widget\": \"invisible\"\n    },\n    \"compliance\": {\n      \"consents\": [\n        {\n          \"policy\": \"string\",\n          \"required\": false,\n          \"version\": \"string\"\n        }\n      ],\n      \"dataRegion\": \"string\",\n      \"minors\": {\n        \"birthdateTrait\": \"string\",\n        \"consentAges\": {},\n        \"consentTtlHours\": 0,\n        \"countryTrait\": \"string\",\n        \"defaultConsentAge\": 0,\n        \"enabled\": false,\n        \"minimumAge\": 0,\n        \"restriction\": \"flag\"\n      },\n      \"retention\": {\n        \"anonymousRetentionDays\": 0,\n        \"cancelDeletionOnSignIn\": false,\n        \"deletedUserGraceDays\": 0,\n        \"erasureGraceDays\": 0\n      }\n    },\n    \"dangerouslyReportSkippedEmailsAsVerified\": false,\n    \"deletedUserReturn\": \"allow\",\n    \"endUserApiKeys\": {\n      \"allowedClaimNames\": [\n        \"string\"\n      ],\n      \"allowedScopes\": [\n        \"string\"\n      ],\n      \"allowOrganizationKeys\": false,\n      \"defaultExpiresInSeconds\": 0,\n      \"keyPrefix\": \"string\",\n      \"maxActiveKeysPerSubject\": 0,\n      \"maxExpiresInSeconds\": 0,\n      \"organizationPermission\": \"string\",\n      \"scopeImplications\": {},\n      \"selfServiceEnabled\": false\n    },\n    \"entitlements\": {\n      \"features\": [\n        {\n          \"key\": \"string\",\n          \"name\": \"string\"\n        }\n      ],\n      \"plans\": [\n        {\n          \"features\": [],\n          \"key\": \"string\",\n          \"name\": \"string\"\n        }\n      ]\n    },\n    \"externalJwt\": {\n      \"issuers\": [\n        {\n          \"audience\": \"string\",\n          \"emailClaim\": \"string\",\n          \"id\": \"string\",\n          \"issuer\": \"string\",\n          \"jwksUri\": \"string\"\n        }\n      ]\n    },\n    \"identityTraits\": {\n      \"audienceKey\": \"string\",\n      \"groups\": [\n        {\n          \"key\": \"string\",\n          \"label\": \"string\",\n          \"labels\": {}\n        }\n      ],\n      \"traits\": [\n        {\n          \"key\": \"string\",\n          \"type\": \"array\"\n        }\n      ]\n    },\n    \"jwtTemplates\": {},\n    \"jwtTemplateSettings\": {},\n    \"kerberos\": {\n      \"allowJitProvisioning\": false,\n      \"emailDomain\": \"string\",\n      \"principalHeader\": \"string\",\n      \"realm\": \"string\"\n    },\n    \"ldap\": {\n      \"connections\": [\n        {\n          \"attributes\": {\n            \"email\": null,\n            \"firstName\": null,\n            \"groups\": null,\n            \"lastName\": null,\n            \"username\": null\n          },\n          \"baseDN\": \"string\",\n          \"bindDN\": \"string\",\n          \"id\": \"string\",\n          \"requireConsentScreen\": false,\n          \"url\": \"string\",\n          \"userFilter\": \"string\"\n        }\n      ]\n    },\n    \"localization\": {\n      \"defaultLocale\": \"string\",\n      \"enabledLocales\": [\n        \"string\"\n      ]\n    },\n    \"mcpConnector\": {\n      \"allowedRedirectHosts\": [\n        \"string\"\n      ],\n      \"dynamicRegistration\": false,\n      \"enabled\": false,\n      \"exposedScopes\": [\n        \"email\"\n      ],\n      \"name\": \"string\"\n    },\n    \"mfa\": {\n      \"backupCodes\": {\n        \"count\": 0\n      },\n      \"duo\": {\n        \"apiHost\": \"string\",\n        \"clientId\": \"string\"\n      },\n      \"factors\": {\n        \"customChallenge\": false,\n        \"duo\": false,\n        \"emailCode\": false,\n        \"hotp\": false,\n        \"passkey\": false,\n        \"push\": false,\n        \"sms\": false,\n        \"totp\": false,\n        \"yubikey\": false\n      },\n      \"hotp\": {\n        \"algorithm\": \"SHA1\",\n        \"digits\": 6,\n        \"lookAhead\": 0\n      },\n      \"rememberDevice\": {\n        \"days\": 0,\n        \"enabled\": false\n      },\n      \"securityQuestions\": {\n        \"enabled\": false,\n        \"maxAttempts\": 0,\n        \"questions\": [\n          \"string\"\n        ]\n      },\n      \"smartCard\": {\n        \"certHeader\": \"string\",\n        \"enabled\": false,\n        \"fingerprintHeader\": \"string\",\n        \"mappingRules\": [\n          \"fingerprint\"\n        ],\n        \"satisfiesMfa\": false,\n        \"secretHeader\": \"string\",\n        \"subjectHeader\": \"string\",\n        \"verifyHeader\": \"string\"\n      },\n      \"totp\": {\n        \"algorithm\": \"SHA1\",\n        \"digits\": 6,\n        \"period\": 30\n      },\n      \"totpEnrollmentCodes\": 0,\n      \"yubikey\": {\n        \"apiUrls\": [\n          \"string\"\n        ],\n        \"clientId\": \"string\",\n        \"mode\": \"cloud\"\n      }\n    },\n    \"mfaPolicy\": \"off\",\n    \"nativeApps\": {\n      \"androidApps\": [\n        {\n          \"packageName\": \"string\",\n          \"sha256CertFingerprints\": []\n        }\n      ],\n      \"appleAppIds\": [\n        \"string\"\n      ]\n    },\n    \"oauthProvider\": {\n      \"accessTokenFormat\": \"jwt\",\n      \"advanced\": {\n        \"cibaPasswordFallback\": false,\n        \"clientAttestationIssuers\": [\n          {\n            \"issuer\": null,\n            \"jwks\": null,\n            \"jwksUri\": null\n          }\n        ],\n        \"federation\": {\n          \"authorityHints\": [],\n          \"automaticRegistration\": false,\n          \"enabled\": false,\n          \"explicitRegistration\": false,\n          \"maxChainDepth\": 0,\n          \"organizationName\": null,\n          \"statementTtlSeconds\": 0,\n          \"subordinates\": [],\n          \"trustAnchors\": []\n        },\n        \"mtlsEndpointHost\": \"string\",\n        \"nativeSso\": false,\n        \"requireSoftwareStatement\": false,\n        \"sessionManagement\": false,\n        \"softwareStatementIssuers\": [\n          {\n            \"issuer\": null,\n            \"jwks\": null,\n            \"jwksUri\": null\n          }\n        ],\n        \"spiffeTrustDomains\": [\n          {\n            \"bundleEndpoint\": null,\n            \"jwtAuthorities\": null,\n            \"trustDomain\": null,\n            \"x509Authorities\": null\n          }\n        ],\n        \"transactionTokens\": {\n          \"enabled\": false,\n          \"trustDomains\": [],\n          \"ttlSeconds\": 0\n        }\n      },\n      \"authorizationDetailsTypesSupported\": [\n        \"string\"\n      ],\n      \"clientIdMetadataDocuments\": {\n        \"allowedHosts\": [\n          \"string\"\n        ],\n        \"blockedHosts\": [\n          \"string\"\n        ],\n        \"enabled\": false,\n        \"trustedHosts\": [\n          \"string\"\n        ]\n      },\n      \"consentUrl\": \"string\",\n      \"customScopes\": [\n        {\n          \"claims\": [],\n          \"description\": \"string\",\n          \"name\": \"string\",\n          \"parameters\": []\n        }\n      ],\n      \"deviceApprovalRequiresStepUp\": false,\n      \"dynamicClientSecretTtlSeconds\": 0,\n      \"dynamicRegistration\": false,\n      \"loginUrl\": \"string\",\n      \"requireInitialAccessToken\": false,\n      \"requirePkce\": false,\n      \"requirePushedAuthorizationRequests\": false,\n      \"tokenClaims\": [\n        {\n          \"scope\": \"string\",\n          \"template\": \"string\",\n          \"tokens\": []\n        }\n      ],\n      \"tokenLifetimes\": {\n        \"accessTokenSeconds\": 0,\n        \"authorizationCodeSeconds\": 0,\n        \"deviceCodeSeconds\": 0,\n        \"idTokenSeconds\": 0,\n        \"refreshTokenAbsoluteSeconds\": 0,\n        \"refreshTokenIdleSeconds\": 0\n      },\n      \"umaEnabled\": false\n    },\n    \"organizations\": {\n      \"allowCustomRolesFromApp\": false,\n      \"allowDeletionFromApp\": false,\n      \"creatorRole\": \"string\",\n      \"defaultMaxAllowedMemberships\": 0,\n      \"inheritAncestorRoles\": false,\n      \"invitationTtlSeconds\": 0,\n      \"maxCustomRolesPerOrganization\": 0,\n      \"maxMembersPerTeam\": 0,\n      \"maxOrganizationsPerUser\": 0,\n      \"maxPendingInvitationsPerOrganization\": 0,\n      \"maxTeamsPerOrganization\": 0\n    },\n    \"passkeyPolicy\": {\n      \"attachment\": \"any\",\n      \"attestation\": \"direct\",\n      \"authenticatorAllowlist\": [\n        \"string\"\n      ],\n      \"authenticatorBlocklist\": [\n        \"string\"\n      ],\n      \"mds\": {\n        \"blockStatuses\": [\n          \"string\"\n        ],\n        \"enabled\": false,\n        \"enforceAtSignIn\": false\n      },\n      \"requireUserVerification\": false,\n      \"requireUserVerificationForFirstFactor\": false,\n      \"timeoutSeconds\": 0\n    },\n    \"passwordPolicy\": {\n      \"bannedPasswords\": [\n        \"string\"\n      ],\n      \"breachCheckOnSignIn\": \"off\",\n      \"checkBreaches\": false,\n      \"historyCount\": 0,\n      \"maxAgeDays\": 0,\n      \"maxLength\": 0,\n      \"minLength\": 0,\n      \"rejectCommonPasswords\": false,\n      \"rejectIdentifierSubstring\": false,\n      \"requireLowercase\": false,\n      \"requireNumber\": false,\n      \"requireSymbol\": false,\n      \"requireUppercase\": false\n    },\n    \"pca\": {\n      \"enabled\": false,\n      \"maxPlanNodes\": 0,\n      \"publicRateLimitPerMin\": 0\n    },\n    \"phoneChannels\": {\n      \"sms\": false,\n      \"voice\": false,\n      \"whatsapp\": false\n    },\n    \"qrSignIn\": {\n      \"enabled\": false,\n      \"matchCodeDigits\": 0,\n      \"ttlMinutes\": 0\n    },\n    \"rateLimit\": {\n      \"bapiPerMin\": 0,\n      \"fapiCreatePerMin\": 0,\n      \"fapiVerifyPerMin\": 0,\n      \"ldapPerIpPerMin\": 0,\n      \"ldapPerUserPerMin\": 0,\n      \"rules\": [\n        {\n          \"group\": \"account_changes\",\n          \"key\": \"instance\",\n          \"max\": 0,\n          \"windowSeconds\": 0\n        }\n      ]\n    },\n    \"requireEmailVerification\": false,\n    \"restrictions\": {\n      \"allowlistOnly\": false\n    },\n    \"riskBasedMfa\": {\n      \"baseline\": {\n        \"enabled\": false,\n        \"weight\": 0\n      },\n      \"enabled\": false,\n      \"fraud\": {\n        \"deviceRateLimit\": {\n          \"adaptive\": false,\n          \"enabled\": false,\n          \"perHour\": 0\n        },\n        \"rules\": [\n          {\n            \"action\": null,\n            \"conditions\": null,\n            \"enabled\": null,\n            \"id\": null,\n            \"name\": null,\n            \"reason\": null\n          }\n        ],\n        \"sanctionedCountries\": [\n          \"string\"\n        ]\n      },\n      \"levelActions\": {\n        \"high\": \"allow\",\n        \"medium\": \"allow\"\n      },\n      \"midSession\": {\n        \"action\": \"audit\",\n        \"enabled\": false\n      },\n      \"mode\": \"audit\",\n      \"onHighRiskNoFactor\": \"allow\",\n      \"reputation\": {\n        \"emailChecks\": false,\n        \"emailWeight\": 0,\n        \"flagAnonymizers\": false,\n        \"ipWeight\": 0,\n        \"minScore\": 0,\n        \"provider\": \"ipqs\"\n      },\n      \"signals\": {\n        \"dormantAccount\": false,\n        \"impossibleTravel\": false,\n        \"newDevice\": false,\n        \"newIp\": false,\n        \"newSubnet\": false,\n        \"velocity\": false\n      },\n      \"stepUpThreshold\": \"high\",\n      \"weights\": {\n        \"dormantAccount\": 0,\n        \"impossibleTravel\": 0,\n        \"newDevice\": 0,\n        \"newIp\": 0,\n        \"newSubnet\": 0,\n        \"velocity\": 0\n      }\n    },\n    \"samlIdp\": {\n      \"serviceProviders\": [\n        {\n          \"acsUrl\": \"string\",\n          \"entityId\": \"string\",\n          \"id\": \"string\"\n        }\n      ]\n    },\n    \"session\": {\n      \"absoluteMs\": 0,\n      \"audience\": \"string\",\n      \"crossSubdomainCookies\": false,\n      \"customData\": {\n        \"claim\": \"string\",\n        \"inToken\": false\n      },\n      \"idleMs\": 0,\n      \"idleReconcileAcrossOrgs\": false,\n      \"idleTimeout\": false,\n      \"includeEmailClaim\": false,\n      \"includeEndUserPoolClaim\": false,\n      \"includeOrgsClaim\": false,\n      \"jwtTtlSeconds\": 0,\n      \"maxConcurrentSessions\": 0,\n      \"multiSession\": false,\n      \"refreshRotation\": false,\n      \"rememberMe\": false,\n      \"revokeOnPasswordChange\": false,\n      \"tokenIncludedSettingsKeys\": [\n        \"string\"\n      ],\n      \"tokenStrategy\": \"refresh\"\n    },\n    \"signals\": {\n      \"rawCapture\": false,\n      \"retentionDays\": 0\n    },\n    \"signInAfterReset\": false,\n    \"signUpMode\": \"public\",\n    \"srp\": {\n      \"deviceTracking\": \"always\",\n      \"enabled\": false,\n      \"poolName\": \"string\"\n    },\n    \"stepUp\": {\n      \"enabled\": false,\n      \"windowMs\": 0\n    },\n    \"strategies\": {\n      \"anonymous\": false,\n      \"emailCode\": false,\n      \"emailLink\": false,\n      \"kerberos\": false,\n      \"oauthProviders\": [\n        \"string\"\n      ],\n      \"passkey\": false,\n      \"password\": false,\n      \"phoneCode\": false,\n      \"siwb\": false,\n      \"siwe\": false,\n      \"siwf\": false,\n      \"siws\": false,\n      \"username\": false\n    },\n    \"strictRequestBodies\": false,\n    \"verification\": {\n      \"emailCode\": {\n        \"charset\": \"alphanumeric\",\n        \"length\": 0,\n        \"maxAttempts\": 0,\n        \"resendCooldownSeconds\": 0,\n        \"resendHourlyLimit\": 0,\n        \"resendSameCode\": false,\n        \"ttlMinutes\": 0\n      },\n      \"magicLink\": {\n        \"resendCooldownSeconds\": 0,\n        \"resendHourlyLimit\": 0,\n        \"ttlMinutes\": 0\n      },\n      \"smsCode\": {\n        \"length\": 0,\n        \"maxAttempts\": 0,\n        \"resendCooldownSeconds\": 0,\n        \"resendHourlyLimit\": 0,\n        \"ttlMinutes\": 0\n      }\n    },\n    \"walletGating\": {\n      \"enabled\": false,\n      \"rpcUrls\": {},\n      \"rules\": [\n        {\n          \"action\": \"grant\",\n          \"chainId\": 0,\n          \"contract\": \"string\",\n          \"id\": \"string\",\n          \"label\": \"string\",\n          \"minBalance\": \"string\",\n          \"standard\": \"erc1155\",\n          \"tokenId\": \"string\"\n        }\n      ]\n    },\n    \"branding\": {\n      \"audiences\": {}\n    }\n  }\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -21236,7 +21332,7 @@
                     }
                   ]
                 },
-                "description": "Update the before_user_create hook. Only the fields you send change; null clears. The hook is called (signed like a webhook) after the user id is assigned and before user.created, the referral call and any session. It may answer {external_id, public_metadata, private_metadata, unsafe_metadata}, or deny the sign-up with {\"deny\": true, \"reason\": \"...\"} or HTTP 403: the person gets 403 SIGN_UP_DENIED with your reason, no user is kept and no user.created is sent. A slow or failing hook does not block the sign-up unless fail_closed is true. The body carries data.user, data.strategy, data.referral, data.request ({client_id, app_context, login_hint} of the authorize request, nulls when absent) and data.invitation (the pending instance invitation for the address, or null) and data.organization ({id, external_id, role, role_mapped, via: sso | domain} when the sign-up comes through an organization SSO connection or a captured auto-join domain, else null). Turning the hook on, or changing the url or signing_secret of a fail_closed enabled one (or turning fail_closed on for it), first sends the signed test call: unless it returns a valid answer (an answer object, possibly empty, or a deny) the change is refused with 409 HOOK_TEST_FAILED (meta: url, status, the first 200 bytes of the response body, outcome) and the hook stays as it was. ?force=true (or force in the body) skips the test and is audit-logged. A dry run (?dry_run=true) makes the same test call and reports would_return_status 409 (or 200) without changing anything. An enabled hook that is not fail_closed is not re-tested when its url or secret changes.\n**Required scope:** `instance:write`\n\n`PATCH /v1/instance/hooks/before_user_create`"
+                "description": "Update the before_user_create hook. Only the fields you send change; null clears. The hook is called (signed like a webhook) after the user id is assigned and before user.created, the referral call and any session. It may answer {external_id, public_metadata, private_metadata, unsafe_metadata}, or deny the sign-up with {\"deny\": true, \"reason\": \"...\"} or HTTP 403: the person gets 403 SIGN_UP_DENIED with your reason, no user is kept and no user.created is sent. A slow or failing hook does not block the sign-up unless fail_closed is true. The body carries data.user, data.strategy, data.referral, data.request ({client_id, app_context, login_hint} of the authorize request, nulls when absent) and data.invitation (the pending instance invitation for the address, or null) and data.organization ({id, external_id, role, role_mapped, via: sso | domain} when the sign-up comes through an organization SSO connection or a captured auto-join domain, else null). Turning the hook on, or changing the url or signing_secret of a fail_closed enabled one (or turning fail_closed on for it), first sends the signed test call: unless it returns a valid answer (an answer object, possibly empty, or a deny) the change is refused with 409 HOOK_TEST_FAILED (meta: url, status, the first 200 bytes of the response body, outcome) and the hook stays as it was. ?force=true (or force in the body) skips the test and is audit-logged. A dry run (?dry_run=true) makes the same test call and changes nothing: it answers would_return (the hook exactly as the PATCH would leave it, e.g. enabled: true) and changes [{section, before, after}] with would_return_status 200, or would_return_status 409 with the refusal. An enabled hook that is not fail_closed is not re-tested when its url or secret changes.\n**Required scope:** `instance:write`\n\n`PATCH /v1/instance/hooks/before_user_create`"
               },
               "response": []
             },
@@ -21725,6 +21821,49 @@
               "response": []
             },
             {
+              "name": "POST Re-send what the integration's event receiver never got: every event since `since` with no successful delivery and ",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"since\": 0,\n  \"status\": \"failed\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/integrations/:product/deliveries/redeliver",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "integrations",
+                    ":product",
+                    "deliveries",
+                    "redeliver"
+                  ],
+                  "variable": [
+                    {
+                      "key": "product",
+                      "value": "product"
+                    }
+                  ]
+                },
+                "description": "Re-send what the integration's event receiver never got: every event since `since` with no successful delivery and no retry still scheduled, including events recorded while the receiver was disabled. Each goes out signed and addressed as of now, with its original event id. Switches a disabled receiver back on. At most 1,000 events per call (`has_more` + `next_since` to continue). Running it again queues nothing new, including two calls at once with no Idempotency-Key. 409 when `since` is older than the 90-day event retention; past the 30-day delivery log Atlas cannot tell what was delivered, so an older `since` can re-send delivered events. 404 when the integration has no event receiver. Honours Idempotency-Key.\n**Required scope:** `instance:write`\n\n`POST /v1/instance/integrations/{product}/deliveries/redeliver`"
+              },
+              "response": []
+            },
+            {
               "name": "POST Re-wrap data keys and vault versions wrapped by an earlier KMS key under the provider as configured now. Pass `prev",
               "request": {
                 "method": "POST",
@@ -21874,7 +22013,7 @@
               "response": []
             },
             {
-              "name": "POST Reveal the signing secret of the integration's event receiver, so the service can verify the Atlas-Signature of eac",
+              "name": "POST Reveal the signing secret of the integration's event receiver, so the service can verify the signature of each deli",
               "request": {
                 "method": "POST",
                 "header": [],
@@ -21897,7 +22036,7 @@
                     }
                   ]
                 },
-                "description": "Reveal the signing secret of the integration's event receiver, so the service can verify the Atlas-Signature of each delivery. Audited. 404 when the integration has no event receiver.\n**Required scope:** `instance:write`\n\n`POST /v1/instance/integrations/{product}/events_secret`"
+                "description": "Reveal the signing secret of the integration's event receiver, so the service can verify the signature of each delivery. Forumulate's default receiver: a key that strict Standard Webhooks verifiers cannot read, and that no delivery has proven, is replaced here. Audited. 404 when the integration has no event receiver.\n**Required scope:** `instance:write`\n\n`POST /v1/instance/integrations/{product}/events_secret`"
               },
               "response": []
             },
@@ -21913,7 +22052,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"grace_period_seconds\": 0,\n  \"emergency\": false,\n  \"alg\": \"RS256\",\n  \"key\": \"main\"\n}",
+                  "raw": "{\n  \"grace_period_seconds\": 0,\n  \"emergency\": false,\n  \"alg\": \"RS256\",\n  \"key\": \"main\",\n  \"staged\": false,\n  \"activates_at\": \"string\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -21932,7 +22071,7 @@
                     "rotate"
                   ]
                 },
-                "description": "Rotate the instance signing key, optionally switching its algorithm (`alg`: RS256 or ES256; RS256 is the default for new instances). A new key signs from now on, and a secondary key (for APIs set to the other algorithm) rotates with it; the previous public key stays in the JWKS for `grace_period_seconds` (default 86400, at most 2592000) so issued tokens and relying-party JWKS caches keep verifying. A second rotation inside a running grace window is a 409 unless `emergency: true`, which publishes ONLY the new key (every token signed by the old one stops verifying at once — for a suspected compromise). Audited as signing_key.rotated.\n**Required scope:** `instance:write`\n\n`POST /v1/instance/signing_keys/rotate`"
+                "description": "Rotate the instance signing key, optionally switching its algorithm (`alg`: RS256 or ES256; RS256 is the default for new instances). A new key signs from now on, and a secondary key (for APIs set to the other algorithm) rotates with it; the previous public key stays in the JWKS for `grace_period_seconds` (default 86400, at most 2592000) so issued tokens and relying-party JWKS caches keep verifying. A second rotation inside a running grace window is a 409 unless `emergency: true`, which publishes ONLY the new key (every token signed by the old one stops verifying at once — for a suspected compromise) and discards a staged key. Audited as signing_key.rotated. `staged: true` (or the `prepublish_days` policy) instead pre-publishes: the new key goes into the JWKS after the current keys and starts signing at `activates_at`, when the old key becomes previous for 24 hours; listed as `status: next`, cancelled with DELETE /v1/instance/signing_keys/next, audited and sent as signing_key.staged, then signing_key.activated.\n**Required scope:** `instance:write`\n\n`POST /v1/instance/signing_keys/rotate`"
               },
               "response": []
             },
@@ -22032,7 +22171,43 @@
                     "test"
                   ]
                 },
-                "description": "Send a sample sign-up (a user that does not exist) to the hook and report its answer. Nothing is stored on any user; the call appears in the delivery log flagged test, and does not change last_call. The call says it is a test: `\"test\": true` in the body (real calls send false) and an `atlas-test: 1` header, so the hook answers without reserving an id or creating anything.\n**Required scope:** `instance:write`\n\n`POST /v1/instance/hooks/before_user_create/test`"
+                "description": "Send a sample sign-up (a user that does not exist) to the hook and report its answer. Nothing is stored on any user; the call appears in the delivery log flagged test, and does not change last_call. The call says it is a test: `\"test\": true` in the body (real calls send false) and an `atlas-test: 1` header, so the hook answers without reserving an id or creating anything. Answers with the shared test-call fields ok, status (success | failed), http_status and latency_ms (the same four a webhook endpoint test returns), plus answer or error.\n**Required scope:** `instance:write`\n\n`POST /v1/instance/hooks/before_user_create/test`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Send every organization's owner to the referral platform once (an `accounts` call per organization: accountRef = th",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"starting_after\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/instance/referrals/accounts/resync",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "instance",
+                    "referrals",
+                    "accounts",
+                    "resync"
+                  ]
+                },
+                "description": "Send every organization's owner to the referral platform once (an `accounts` call per organization: accountRef = the organization's external_id, else its id; ownerCustomerRef = the owner's customerRef). The owner is the organization's creator while they hold the creator role or org:admin, else the longest-standing member holding one of those roles; organizations with no such member are counted in organizations_without_owner and skipped. Calls go out at about 10 per second through the delivery log (kind `accounts`), oldest first, up to 10,000 organizations per request (continue with `starting_after` = `next_starting_after`); the platform treats a repeat as a no-op. Atlas already sends these on its own when an organization is created, its external_id changes or its owner changes, and once when the platform first advertises `accounts`: use this after restoring data or to be sure. Requires referrals to be on and the platform to advertise `accounts` (422 REFERRALS_NOT_CONFIGURED otherwise).\n**Required scope:** `instance:write`\n\n`POST /v1/instance/referrals/accounts/resync`"
               },
               "response": []
             },
@@ -22166,7 +22341,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"preset\": \"string\",\n  \"site_id\": \"string\",\n  \"api_key\": \"string\",\n  \"partner_link_id\": \"string\",\n  \"completion_webhook_url\": \"https://example.com\",\n  \"cookie_consent\": {},\n  \"orchestrator\": {},\n  \"key\": {\n    \"id\": \"string\",\n    \"name\": \"string\",\n    \"scopes\": [\n      \"string\"\n    ],\n    \"expires_at\": 0,\n    \"allowed_ips\": [\n      \"string\"\n    ],\n    \"allowed_origins\": [\n      \"string\"\n    ]\n  }\n}",
+                  "raw": "{\n  \"preset\": \"string\",\n  \"site_id\": \"string\",\n  \"api_key\": \"string\",\n  \"partner_link_id\": \"string\",\n  \"completion_webhook_url\": \"https://example.com\",\n  \"executor_connection_id\": \"string\",\n  \"cookie_consent\": {},\n  \"orchestrator\": {},\n  \"key\": {\n    \"id\": \"string\",\n    \"name\": \"string\",\n    \"scopes\": [\n      \"string\"\n    ],\n    \"expires_at\": 0,\n    \"allowed_ips\": [\n      \"string\"\n    ],\n    \"allowed_origins\": [\n      \"string\"\n    ]\n  }\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -22185,7 +22360,7 @@
                     "connect"
                   ]
                 },
-                "description": "Wire a consent manager / data-rights orchestrator to the instance both ways in one call. `preset` is an orchestrator preset (`cookiemunch` fills the banner script, CSP origins and case URLs from `site_id`) or `custom` (send `cookie_consent.script_url` and `orchestrator.name` / `case_url` yourself). Sets the hosted-page CMP, the orchestrator Atlas opens cases with (`api_key` or `partner_link_id`), the DSR completion webhook to the orchestrator's executor connection (`completion_webhook_url`), and mints a secret key with `privacy:*` scopes and `cookie_consent:read` only (default `privacy:execute` + `privacy:grants:revoke` + `cookie_consent:read`) for the orchestrator to call the executor protocol with, or uses the one it already holds (`key.id`). `executor_key.action` says which: `minted`, `kept`, `upgraded` (a re-run added requested scopes the key lacked; secret unchanged) or `adopted`. `warnings` says when a new key is minted. Idempotent: a re-run updates the same settings and returns the same key without its secret (`idempotent_replay: true`); rotate it with POST /v1/secret_keys/{id}/rotate. The body is validated in full before anything is written; errors name the nested field (`cookie_consent.script_url`, `key.scopes.0`). Needs `instance:write` and `secret_keys:write` (and recent MFA for an operator token on first mint). → 201 when the orchestrator or the key was created, else 200.\n**Required scope:** `instance:write`\n\n`POST /v1/instance/privacy_integrations/connect`"
+                "description": "Wire a consent manager / data-rights orchestrator to the instance both ways in one call. `preset` is an orchestrator preset (`cookiemunch` fills the banner script, CSP origins and case URLs from `site_id`) or `custom` (send `cookie_consent.script_url` and `orchestrator.name` / `case_url` yourself). Sets the hosted-page CMP, the orchestrator Atlas opens cases with (`api_key` or `partner_link_id`), the DSR completion webhook to the orchestrator's executor connection (`completion_webhook_url`, or with preset cookiemunch `executor_connection_id`: Atlas reads that connection's `webhookUrl` from Cookie Munch and `dsr_webhook.secret_destination` says where its signing secret goes), and mints a secret key with `privacy:*` scopes and `cookie_consent:read` only (default `privacy:execute` + `privacy:grants:revoke` + `cookie_consent:read`) for the orchestrator to call the executor protocol with, or uses the one it already holds (`key.id`). `executor_key.action` says which: `minted`, `kept`, `upgraded` (a re-run added requested scopes the key lacked; secret unchanged) or `adopted`. `warnings` says when a new key is minted. Idempotent: a re-run updates the same settings and returns the same key without its secret (`idempotent_replay: true`); rotate it with POST /v1/secret_keys/{id}/rotate. The body is validated in full before anything is written; errors name the nested field (`cookie_consent.script_url`, `key.scopes.0`). Needs `instance:write` and `secret_keys:write` (and recent MFA for an operator token on first mint). → 201 when the orchestrator or the key was created, else 200.\n**Required scope:** `instance:write`\n\n`POST /v1/instance/privacy_integrations/connect`"
               },
               "response": []
             },
@@ -22311,7 +22486,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"enabled\": false,\n  \"audience\": \"string\",\n  \"name\": \"string\",\n  \"role\": \"support_chat\",\n  \"audience_format\": \"string\",\n  \"principal_claim\": \"audience_hint\",\n  \"ext_claim\": \"external_id\",\n  \"ttl_seconds\": 0,\n  \"events_url\": \"string\",\n  \"backchannel_logout_url\": \"string\",\n  \"oauth_client_id\": \"string\",\n  \"verify_error_report_url\": \"string\",\n  \"cmp\": {\n    \"script_url\": \"string\",\n    \"script_id\": \"string\",\n    \"site_id\": \"string\",\n    \"blocking_mode\": \"string\",\n    \"extra_origins\": [\n      \"string\"\n    ],\n    \"settings_preset\": \"cookiemunch\",\n    \"consent_api\": {\n      \"global\": \"string\",\n      \"has_method\": \"string\",\n      \"request_method\": \"string\",\n      \"category_map\": {}\n    }\n  },\n  \"atlas_id_users\": false,\n  \"per_call_audience\": {\n    \"param\": \"string\",\n    \"template\": \"string\",\n    \"allowed\": [\n      \"string\"\n    ],\n    \"any_matching\": false,\n    \"default\": false\n  },\n  \"metadata\": {},\n  \"external_ref\": \"string\",\n  \"channel\": \"string\",\n  \"org_id\": \"string\",\n  \"spaces\": [\n    \"string\"\n  ]\n}",
+                  "raw": "{\n  \"enabled\": false,\n  \"replace_existing\": false,\n  \"forumulate_api_key\": \"string\",\n  \"audience\": \"string\",\n  \"name\": \"string\",\n  \"role\": \"support_chat\",\n  \"audience_format\": \"string\",\n  \"principal_claim\": \"audience_hint\",\n  \"ext_claim\": \"external_id\",\n  \"claims\": {\n    \"org\": false,\n    \"org_role\": false,\n    \"public_metadata\": [\n      \"string\"\n    ]\n  },\n  \"ttl_seconds\": 0,\n  \"events_url\": \"string\",\n  \"backchannel_logout_url\": \"string\",\n  \"oauth_client_id\": \"string\",\n  \"verify_error_report_url\": \"string\",\n  \"cmp\": {\n    \"script_url\": \"string\",\n    \"script_id\": \"string\",\n    \"site_id\": \"string\",\n    \"blocking_mode\": \"string\",\n    \"extra_origins\": [\n      \"string\"\n    ],\n    \"settings_preset\": \"cookiemunch\",\n    \"consent_api\": {\n      \"global\": \"string\",\n      \"has_method\": \"string\",\n      \"request_method\": \"string\",\n      \"category_map\": {}\n    }\n  },\n  \"atlas_id_users\": false,\n  \"per_call_audience\": {\n    \"param\": \"string\",\n    \"template\": \"string\",\n    \"allowed\": [\n      \"string\"\n    ],\n    \"any_matching\": false,\n    \"default\": false\n  },\n  \"metadata\": {},\n  \"external_ref\": \"string\",\n  \"channel\": \"string\",\n  \"org_id\": \"string\",\n  \"spaces\": [\n    \"string\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -22336,7 +22511,7 @@
                     }
                   ]
                 },
-                "description": "Connect (or replace) an identity integration: any service that verifies a user with a JWT. getToken({ for: '<id>' }) then mints a token of at most 120 s with aud = audience, sub (the Atlas user id), ext (external_id), principal (the branding audience the user signed in under), sid, email, email_verified, name and locale, verifiable against the instance JWKS. Atlas also delivers user.updated / user.banned / user.unbanned / user.deleted / session.revoked to events_url and an OIDC Back-Channel Logout token to backchannel_logout_url on every session end. ?dry_run=true validates in full and answers { object: 'dry_run', changes, would_return } without saving. Also accepts metadata tags and external_ref. The OAuth client the service signs users in with (oauth_client_id, else the client tagged product=<integration id>) gets its https redirect-URI origins added to allowed_origins (append only, recorded in the config changelog); the response lists them in added_origins. The integration id: a preset (chatly, forumulate, cookiemunch, referalli) or a custom integration id (2-40 lowercase letters, digits, \"_\" or \"-\", starting with a letter).\n**Required scope:** `instance:write`\n\n`PUT /v1/instance/integrations/{product}`"
+                "description": "Connect (or replace) an identity integration: any service that verifies a user with a JWT. getToken({ for: '<id>' }) then mints a token of at most 120 s with aud = audience, sub (the Atlas user id), ext (external_id), principal (the branding audience the user signed in under), sid, email, email_verified, name and locale, verifiable against the instance JWKS. Atlas also delivers user.updated / user.banned / user.unbanned / user.deleted / session.revoked to events_url and an OIDC Back-Channel Logout token to backchannel_logout_url on every session end. ?dry_run=true validates in full and answers { object: 'dry_run', changes, would_return } without saving. Also accepts metadata tags and external_ref. The OAuth client the service signs users in with (oauth_client_id, else the client tagged product=<integration id>) gets its https redirect-URI origins added to allowed_origins (append only, recorded in the config changelog); the response lists them in added_origins. For forumulate, warnings says when Forumulate already sends readers elsewhere (existing_sign_in_url_overrides: an org-level signInUrl; atlas_reader_provider_missing), read from its public reader sign-in settings. With replace_existing: true and forumulate_api_key (a Forumulate org admin's API key, used for this call only and never stored) Atlas clears the org-level signInUrl and removes every non-Atlas reader provider in Forumulate, and answers replaced. forumulate_api_key alone also reads each space's reader addresses, so spaces[].redeem_url is on the host its readers read. The integration id: a preset (chatly, forumulate, cookiemunch, referalli) or a custom integration id (2-40 lowercase letters, digits, \"_\" or \"-\", starting with a letter).\n**Required scope:** `instance:write`\n\n`PUT /v1/instance/integrations/{product}`"
               },
               "response": []
             },
@@ -24925,7 +25100,7 @@
           "name": "m2m_tokens",
           "item": [
             {
-              "name": "POST Verify a presented machine secret → { valid, machine_id? } (Clerk verifyM2MToken).",
+              "name": "POST Verify a machine secret or machine JWT and report what it holds. Apps verifying a JWT against the JWKS do not need ",
               "request": {
                 "method": "POST",
                 "header": [
@@ -24954,7 +25129,7 @@
                     "verify"
                   ]
                 },
-                "description": "Verify a presented machine secret → { valid, machine_id? } (Clerk verifyM2MToken).\n**Required scope:** `machines:read`\n\n`POST /v1/m2m_tokens/verify`"
+                "description": "Verify a machine secret or machine JWT and report what it holds. Apps verifying a JWT against the JWKS do not need this call.\n**Required scope:** `machines:read`\n\n`POST /v1/m2m_tokens/verify`"
               },
               "response": []
             }
@@ -25067,7 +25242,7 @@
           "name": "machines",
           "item": [
             {
-              "name": "DELETE Delete a machine identity.",
+              "name": "DELETE Delete a machine identity. Sends machine_membership.deleted for each organization membership it held.",
               "request": {
                 "method": "DELETE",
                 "header": [],
@@ -25088,7 +25263,39 @@
                     }
                   ]
                 },
-                "description": "Delete a machine identity.\n**Required scope:** `machines:write`\n\n`DELETE /v1/machines/{id}`"
+                "description": "Delete a machine identity. Sends machine_membership.deleted for each organization membership it held.\n**Required scope:** `machines:write`\n\n`DELETE /v1/machines/{id}`"
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE Revoke a machine's grant. No new tokens for that resource server; a token already issued lasts until it expires.",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/machines/:id/grants/:grantId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "machines",
+                    ":id",
+                    "grants",
+                    ":grantId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    },
+                    {
+                      "key": "grantId",
+                      "value": "grantId"
+                    }
+                  ]
+                },
+                "description": "Revoke a machine's grant. No new tokens for that resource server; a token already issued lasts until it expires.\n**Required scope:** `machines:write`\n\n`DELETE /v1/machines/{id}/grants/{grantId}`"
               },
               "response": []
             },
@@ -25182,7 +25389,7 @@
               "response": []
             },
             {
-              "name": "GET List the organizations a machine belongs to with the org's resolved plan and the enrolment time — the machine-token ",
+              "name": "GET List the organizations a machine belongs to, with the org's resolved plan: the org that owns it and every org it is ",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -25218,7 +25425,48 @@
                     }
                   ]
                 },
-                "description": "List the organizations a machine belongs to with the org's resolved plan and the enrolment time — the machine-token counterpart of the user organization_memberships route. A machine belongs to at most one org, so this returns zero or one entry. Cursor-paginated.\n**Required scope:** `organizations:read`\n\n`GET /v1/machines/{id}/organization_memberships`"
+                "description": "List the organizations a machine belongs to, with the org's resolved plan: the org that owns it and every org it is a member of. The machine-token counterpart of the user organization_memberships route. Cursor-paginated.\n**Required scope:** `organizations:read`\n\n`GET /v1/machines/{id}/organization_memberships`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET List the resource servers a machine may obtain tokens for, and up to which scopes.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/machines/:id/grants?limit=0&starting_after=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "machines",
+                    ":id",
+                    "grants"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "0",
+                      "disabled": true,
+                      "description": "Page size, 1-500. Without limit (and without starting_after) the whole list is returned."
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "Cursor: return only items after this one. Pass the previous page's `next_cursor` (the last item's id). An unknown cursor is a 400."
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "List the resource servers a machine may obtain tokens for, and up to which scopes.\n**Required scope:** `machines:read`\n\n`GET /v1/machines/{id}/grants`"
               },
               "response": []
             },
@@ -25327,6 +25575,47 @@
                   ]
                 },
                 "description": "Approve a device that enrolled under an approval-gated token (pending → active).\n**Required scope:** `machines:write`\n\n`POST /v1/machines/{id}/approve`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Authorize a machine for a resource server and its scopes. 409 if it already has a grant there.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"resource_server_id\": \"string\",\n  \"scopes\": [\n    \"string\"\n  ],\n  \"scope_presets\": [\n    \"string\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/machines/:id/grants",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "machines",
+                    ":id",
+                    "grants"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Authorize a machine for a resource server and its scopes. 409 if it already has a grant there.\n**Required scope:** `machines:write`\n\n`POST /v1/machines/{id}/grants`"
               },
               "response": []
             },
@@ -29567,7 +29856,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"resource_server_id\": \"string\",\n  \"scopes\": [\n    \"string\"\n  ]\n}",
+                  "raw": "{\n  \"resource_server_id\": \"string\",\n  \"scopes\": [\n    \"string\"\n  ],\n  \"scope_presets\": [\n    \"string\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -32647,6 +32936,38 @@
               "response": []
             },
             {
+              "name": "DELETE Remove a machine from an organization. New tokens no longer carry its role there.",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/organizations/:id/machine_memberships/:machineId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "organizations",
+                    ":id",
+                    "machine_memberships",
+                    ":machineId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    },
+                    {
+                      "key": "machineId",
+                      "value": "machineId"
+                    }
+                  ]
+                },
+                "description": "Remove a machine from an organization. New tokens no longer carry its role there.\n**Required scope:** `organizations:write`\n\n`DELETE /v1/organizations/{id}/machine_memberships/{machineId}`"
+              },
+              "response": []
+            },
+            {
               "name": "DELETE Remove a member. Removing the last admin returns LAST_ADMIN.",
               "request": {
                 "method": "DELETE",
@@ -33393,6 +33714,47 @@
                   ]
                 },
                 "description": "List the apps (OAuth clients) that hold an active grant in this organization's context, one entry per grant.\n**Required scope:** `organizations:read`\n\n`GET /v1/organizations/{id}/connected_apps`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET List the machines that are members of an organization. Separate from user memberships.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/organizations/:id/machine_memberships?limit=100&starting_after=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "organizations",
+                    ":id",
+                    "machine_memberships"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "100",
+                      "disabled": true,
+                      "description": "Page size. Defaults to 100; values above 200 are capped at 200."
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "Cursor: the next_cursor returned by the previous page."
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "List the machines that are members of an organization. Separate from user memberships.\n**Required scope:** `organizations:read`\n\n`GET /v1/organizations/{id}/machine_memberships`"
               },
               "response": []
             },
@@ -34179,6 +34541,52 @@
                   ]
                 },
                 "description": "Approve (active), gate (pending) or block a reader in an organization end-user pool. Blocking keeps the row for the audit trail.\n**Required scope:** `end_users:write`\n\n`PATCH /v1/organizations/{orgId}/end_users/{userId}`"
+              },
+              "response": []
+            },
+            {
+              "name": "PATCH Change a machine's role in an organization. New tokens carry the new role.",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"role\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/organizations/:id/machine_memberships/:machineId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "organizations",
+                    ":id",
+                    "machine_memberships",
+                    ":machineId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    },
+                    {
+                      "key": "machineId",
+                      "value": "machineId"
+                    }
+                  ]
+                },
+                "description": "Change a machine's role in an organization. New tokens carry the new role.\n**Required scope:** `organizations:write`\n\n`PATCH /v1/organizations/{id}/machine_memberships/{machineId}`"
               },
               "response": []
             },
@@ -34990,6 +35398,47 @@
               "response": []
             },
             {
+              "name": "POST Make a machine a member of an organization with a role. Holds no seat. 409 if it is already a member.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"machine_id\": \"string\",\n  \"role\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/organizations/:id/machine_memberships",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "organizations",
+                    ":id",
+                    "machine_memberships"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Make a machine a member of an organization with a role. Holds no seat. 409 if it is already a member.\n**Required scope:** `organizations:write`\n\n`POST /v1/organizations/{id}/machine_memberships`"
+              },
+              "response": []
+            },
+            {
               "name": "POST Re-send every event of this organization since `since` (or since=failing_since) that the endpoint subscribes to and",
               "request": {
                 "method": "POST",
@@ -35509,6 +35958,47 @@
                   ]
                 },
                 "description": "Assign an organization's entitlements (a plan, a feature list and/or limits, optionally expiring) without a billing subscription. Replaces whatever was assigned or overridden before; an empty body clears it and the organization falls back to its billing plan. Reaches the `pla`, `fea` and `ent` session claims on the next token.\n**Required scope:** `billing:write`\n\n`PUT /v1/organizations/{id}/entitlements`"
+              },
+              "response": []
+            },
+            {
+              "name": "PUT Create-or-update the organization keyed by your own id (external_id, the path segment, URL-encoded): 201 with the ne",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"string\",\n  \"slug\": \"string\",\n  \"image_url\": \"string\",\n  \"max_allowed_memberships\": 0,\n  \"public_metadata\": {},\n  \"private_metadata\": {},\n  \"role_mappings\": {},\n  \"created_by\": \"string\",\n  \"owner_email\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/organizations/by_external_id/:external_id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "organizations",
+                    "by_external_id",
+                    ":external_id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "external_id",
+                      "value": "external_id"
+                    }
+                  ]
+                },
+                "description": "Create-or-update the organization keyed by your own id (external_id, the path segment, URL-encoded): 201 with the new organization when none has it (as POST /v1/organizations, external_id set from the path), else 200 with it updated (as PATCH /v1/organizations/{id}; only the fields sent change). Body: name (required when it creates), slug, image_url, max_allowed_memberships, public_metadata, private_metadata, role_mappings, and on create only created_by and owner_email (ignored on update). Two calls racing for a new external_id create exactly one organization; the other updates it. Emits organization.created or organization.updated.\n**Required scope:** `organizations:write`\n\n`PUT /v1/organizations/by_external_id/{external_id}`"
               },
               "response": []
             },
@@ -39066,7 +39556,7 @@
           "name": "resource_servers",
           "item": [
             {
-              "name": "DELETE Delete a resource server; its client grants cascade with it.",
+              "name": "DELETE Delete a resource server; its client and machine grants go with it.",
               "request": {
                 "method": "DELETE",
                 "header": [],
@@ -39087,7 +39577,7 @@
                     }
                   ]
                 },
-                "description": "Delete a resource server; its client grants cascade with it.\n**Required scope:** `resource_servers:write`\n\n`DELETE /v1/resource_servers/{id}`"
+                "description": "Delete a resource server; its client and machine grants go with it.\n**Required scope:** `resource_servers:write`\n\n`DELETE /v1/resource_servers/{id}`"
               },
               "response": []
             },
@@ -39151,7 +39641,7 @@
               "response": []
             },
             {
-              "name": "PATCH Update a resource server. The identifier (audience) is immutable.",
+              "name": "PATCH Update a resource server. The identifier (audience) is immutable, and a scope that a preset names cannot be remove",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -39162,7 +39652,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"string\",\n  \"scopes\": [\n    \"string\"\n  ],\n  \"token_ttl_seconds\": 0,\n  \"identifier\": \"string\",\n  \"publish_resource_metadata\": false,\n  \"signing_alg\": \"RS256\",\n  \"access_token_format\": \"jwt\",\n  \"refresh_token_absolute_ttl_seconds\": 0,\n  \"refresh_token_idle_ttl_seconds\": 0,\n  \"introspection_client_ids\": [\n    \"string\"\n  ]\n}",
+                  "raw": "{\n  \"name\": \"string\",\n  \"scopes\": [\n    \"string\"\n  ],\n  \"scope_presets\": {},\n  \"token_ttl_seconds\": 0,\n  \"identifier\": \"string\",\n  \"publish_resource_metadata\": false,\n  \"signing_alg\": \"RS256\",\n  \"access_token_format\": \"jwt\",\n  \"refresh_token_absolute_ttl_seconds\": 0,\n  \"refresh_token_idle_ttl_seconds\": 0,\n  \"introspection_client_ids\": [\n    \"string\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -39186,12 +39676,12 @@
                     }
                   ]
                 },
-                "description": "Update a resource server. The identifier (audience) is immutable.\n**Required scope:** `resource_servers:write`\n\n`PATCH /v1/resource_servers/{id}`"
+                "description": "Update a resource server. The identifier (audience) is immutable, and a scope that a preset names cannot be removed without changing the preset in the same request.\n**Required scope:** `resource_servers:write`\n\n`PATCH /v1/resource_servers/{id}`"
               },
               "response": []
             },
             {
-              "name": "POST Register a resource server (API): its audience identifier, scopes and token TTL.",
+              "name": "POST Register a resource server (API): its audience identifier, scopes, scope presets and token TTL.",
               "request": {
                 "method": "POST",
                 "header": [
@@ -39202,7 +39692,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"identifier\": \"string\",\n  \"name\": \"string\",\n  \"scopes\": [\n    \"string\"\n  ],\n  \"token_ttl_seconds\": 0,\n  \"publish_resource_metadata\": false,\n  \"signing_alg\": \"RS256\",\n  \"access_token_format\": \"jwt\",\n  \"refresh_token_absolute_ttl_seconds\": 0,\n  \"refresh_token_idle_ttl_seconds\": 0,\n  \"introspection_client_ids\": [\n    \"string\"\n  ]\n}",
+                  "raw": "{\n  \"identifier\": \"string\",\n  \"name\": \"string\",\n  \"scopes\": [\n    \"string\"\n  ],\n  \"scope_presets\": {},\n  \"token_ttl_seconds\": 0,\n  \"publish_resource_metadata\": false,\n  \"signing_alg\": \"RS256\",\n  \"access_token_format\": \"jwt\",\n  \"refresh_token_absolute_ttl_seconds\": 0,\n  \"refresh_token_idle_ttl_seconds\": 0,\n  \"introspection_client_ids\": [\n    \"string\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -39219,7 +39709,7 @@
                     "resource_servers"
                   ]
                 },
-                "description": "Register a resource server (API): its audience identifier, scopes and token TTL.\n**Required scope:** `resource_servers:write`\n\n`POST /v1/resource_servers`"
+                "description": "Register a resource server (API): its audience identifier, scopes, scope presets and token TTL.\n**Required scope:** `resource_servers:write`\n\n`POST /v1/resource_servers`"
               },
               "response": []
             }
@@ -41778,12 +42268,12 @@
               "response": []
             },
             {
-              "name": "GET List a user's active sessions. Requires a user_id query parameter.",
+              "name": "GET List a user's active sessions, or with status=ended the 50 most recently ended ones (each with revoked_reason). Requ",
               "request": {
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/v1/sessions?user_id=string&limit=0&starting_after=string",
+                  "raw": "{{baseUrl}}/v1/sessions?user_id=string&status=string&limit=0&starting_after=string",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -41796,7 +42286,13 @@
                       "key": "user_id",
                       "value": "string",
                       "disabled": false,
-                      "description": "The user whose active sessions to list. Required (400 when missing)."
+                      "description": "The user whose sessions to list. Required (400 when missing)."
+                    },
+                    {
+                      "key": "status",
+                      "value": "string",
+                      "disabled": true,
+                      "description": "active (default) or ended: revoked, expired or replaced sessions, most recently ended first, at most 50."
                     },
                     {
                       "key": "limit",
@@ -41812,7 +42308,7 @@
                     }
                   ]
                 },
-                "description": "List a user's active sessions. Requires a user_id query parameter.\n**Required scope:** `sessions:read`\n\n`GET /v1/sessions`"
+                "description": "List a user's active sessions, or with status=ended the 50 most recently ended ones (each with revoked_reason). Requires a user_id query parameter.\n**Required scope:** `sessions:read`\n\n`GET /v1/sessions`"
               },
               "response": []
             },
@@ -43703,6 +44199,47 @@
                 "description": "Issue a scoped, one-time, expiring onboarding ticket for one organization. Returns the token and hosted URL exactly once. `expires_in_seconds` defaults to 259200 (3 days) and is clamped into [300, 2592000] (5 minutes to 30 days); `expires_in` says what was granted. `return_url` overrides the profile's for this ticket.\n**Required scope:** `sso_connections:write`\n\n`POST /v1/sso_onboarding_profiles/{id}/tickets`"
               },
               "response": []
+            },
+            {
+              "name": "PUT Create-or-update the onboarding profile with this exact name (the path segment, URL-encoded): 201 with the new profi",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"allowed_connection_types\": [\n    \"oidc\"\n  ],\n  \"organization_id\": \"string\",\n  \"company_name\": \"string\",\n  \"allow_scim\": false,\n  \"intents\": [\n    \"sso\"\n  ],\n  \"return_url\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/sso_onboarding_profiles/by_name/:name",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "sso_onboarding_profiles",
+                    "by_name",
+                    ":name"
+                  ],
+                  "variable": [
+                    {
+                      "key": "name",
+                      "value": "name"
+                    }
+                  ]
+                },
+                "description": "Create-or-update the onboarding profile with this exact name (the path segment, URL-encoded): 201 with the new profile when none has the name, else 200 with it updated in place (only the fields sent change). Body: the POST fields except name. Two calls racing for a new name create exactly one profile. 409 IDENTIFIER_EXISTS when two profiles already share the name (POST allows that): rename or delete the extras. Rename with PATCH /v1/sso_onboarding_profiles/{id}.\n**Required scope:** `sso_connections:write`\n\n`PUT /v1/sso_onboarding_profiles/by_name/{name}`"
+              },
+              "response": []
             }
           ]
         },
@@ -44189,7 +44726,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"users\": [\n    {}\n  ],\n  \"upsert\": false,\n  \"create_organizations\": false,\n  \"password_hash_config\": {\n    \"firebase\": {\n      \"signer_key\": \"string\",\n      \"salt_separator\": \"string\",\n      \"rounds\": 0,\n      \"mem_cost\": 0\n    }\n  },\n  \"notify\": false\n}",
+                  "raw": "{\n  \"users\": [\n    {}\n  ],\n  \"upsert\": false,\n  \"create_organizations\": false,\n  \"password_policy\": \"active\",\n  \"password_hash_config\": {\n    \"firebase\": {\n      \"signer_key\": \"string\",\n      \"salt_separator\": \"string\",\n      \"rounds\": 0,\n      \"mem_cost\": 0\n    }\n  },\n  \"notify\": false\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -44206,7 +44743,7 @@
                     "user_imports"
                   ]
                 },
-                "description": "Bulk-create users from an array, deduping by verified email, through the same path sign-up uses. Plaintext passwords are Argon2id-hashed; Argon2id, bcrypt, PBKDF2/scrypt (Django, passlib), Firebase scrypt (with password_hash_config.firebase), Better Auth scrypt and Node crypto.scrypt `scrypt$N$r$p$salt$key` hashes are imported verbatim (a Node string with an all-digit salt is also a valid Django one and must be named: password_hash_algorithm scrypt_node or scrypt_django; scrypt_node takes salt_encoding, default utf8 = the salt text as written). A hash that does not describe itself is imported by naming it: password_hash_algorithm (scrypt, pbkdf2, md5, sha1, sha256, sha512, their _salted forms, hmac_sha256, bcrypt, …) with password_hash_params (scrypt n or log_n / r / p / key_length; pbkdf2 digest / iterations / key_length; md5 and sha* salt_position prefix|suffix; encoding and salt_encoding hex|base64|base64url|utf8) and password_salt; the hash may be the bare digest or `<salt>$<hash>` / `<name>$<salt>$<hash>` (e.g. `scrypt$<salt>$<hash>` with the parameters given separately). Every imported hash is checked with a constant-time compare and upgraded to Argon2id on the first successful sign-in; a format that cannot be checked is rejected per row (unsupported_password_hash, the message names the field). Each row may also carry external_id, image_url (alias profile_image_url: an https URL; an invalid one fails the row with invalid_image_url), created_at, phone_number / phone_numbers and organization_memberships (org by id, external id or slug, plus a role); create_organizations:true creates a missing org. Per-row failures are recorded, never fatal. Body: an array of users, or { users, upsert?, notify?, create_organizations?, password_hash_config? }. An import never notifies the imported users: with notify false (the default) no email, SMS or push is sent as a consequence of the import, whatever templates are configured; notify:true is reserved for future welcome messages and currently sends nothing.\n**Required scope:** `jobs:write`\n\n`POST /v1/user_imports`"
+                "description": "Bulk-create users from an array, deduping by verified email, through the same path sign-up uses. Plaintext passwords are Argon2id-hashed; Argon2id, bcrypt, PBKDF2/scrypt (Django, passlib), Firebase scrypt (with password_hash_config.firebase), Better Auth scrypt and Node crypto.scrypt `scrypt$N$r$p$salt$key` hashes are imported verbatim (a Node string with an all-digit salt is also a valid Django one and must be named: password_hash_algorithm scrypt_node or scrypt_django; scrypt_node takes salt_encoding, default utf8 = the salt text as written). A hash that does not describe itself is imported by naming it: password_hash_algorithm (scrypt, pbkdf2, md5, sha1, sha256, sha512, their _salted forms, hmac_sha256, bcrypt, …) with password_hash_params (scrypt n or log_n / r / p / key_length; pbkdf2 digest / iterations / key_length; md5 and sha* salt_position prefix|suffix; encoding and salt_encoding hex|base64|base64url|utf8) and password_salt; the hash may be the bare digest or `<salt>$<hash>` / `<name>$<salt>$<hash>` (e.g. `scrypt$<salt>$<hash>` with the parameters given separately). Every imported hash is checked with a constant-time compare and upgraded to Argon2id on the first successful sign-in; a format that cannot be checked is rejected per row (unsupported_password_hash, the message names the field). Each row may also carry external_id, image_url (alias profile_image_url: an https URL; an invalid one fails the row with invalid_image_url), created_at, phone_number / phone_numbers and organization_memberships (org by id, external id or slug, plus a role); create_organizations:true creates a missing org. Per-row failures are recorded, never fatal. password_policy \"until_email_verified\" holds the password of a row without email_verified true until an email on the account is proven by any route; a correct password is refused until then with password_not_yet_usable (a wrong one gets the normal failure). Body: an array of users, or { users, upsert?, notify?, create_organizations?, password_policy?, password_hash_config? }. An import never notifies the imported users: with notify false (the default) no email, SMS or push is sent as a consequence of the import, whatever templates are configured; notify:true is reserved for future welcome messages and currently sends nothing.\n**Required scope:** `jobs:write`\n\n`POST /v1/user_imports`"
               },
               "response": []
             }
@@ -44450,6 +44987,55 @@
                   ]
                 },
                 "description": "Remove a registered certificate mapping.\n**Required scope:** `users:write`\n\n`DELETE /v1/users/{id}/smartcard_mappings/{mappingId}`"
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE Remove a user's password: password_enabled becomes false and the old password stops working at once. Also allowed",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sign_out_of_other_sessions\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/users/:id/password?sign_out_of_other_sessions=true",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "users",
+                    ":id",
+                    "password"
+                  ],
+                  "query": [
+                    {
+                      "key": "sign_out_of_other_sessions",
+                      "value": "true",
+                      "disabled": true,
+                      "description": "The same switch, for clients that cannot send a body on DELETE."
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Remove a user's password: password_enabled becomes false and the old password stops working at once. Also allowed when it is the user's only sign-in method. Idempotent: on a user with no password nothing changes and the answer is the same. Signs the user out of their sessions unless sign_out_of_other_sessions is false (in the body, or as a query parameter for clients that cannot send a body on DELETE).\n**Required scope:** `users:write`\n\n`DELETE /v1/users/{id}/password`"
               },
               "response": []
             },
@@ -47105,6 +47691,47 @@
               "response": []
             },
             {
+              "name": "POST Protect one existing unverified user, so a proof of its address reaches it instead of making a second account. Body",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"password_policy\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/users/:id/account_claim",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "users",
+                    ":id",
+                    "account_claim"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "Protect one existing unverified user, so a proof of its address reaches it instead of making a second account. Body: `password_policy` must be `until_email_verified`. A user with a password gets the same hold an import gives. A user with no credential is marked as yours, and a proof of its address then claims it. Naming the exact user id is what makes this safe, so nothing matches by address. Answers 409 ACCOUNT_NOT_CLAIMABLE with `meta.reasons` when the user has a verified address or anything else that signs in, and 422 when it has no email address. Safe to repeat.\n**Required scope:** `users:write`\n\n`POST /v1/users/{id}/account_claim`"
+              },
+              "response": []
+            },
+            {
               "name": "POST Re-assess a user from their date-of-birth trait now (for users created before age gating was turned on). 400 when c",
               "request": {
                 "method": "POST",
@@ -48868,7 +49495,7 @@
                     }
                   ]
                 },
-                "description": "Update any endpoint setting in place; the signing secret is preserved (use rotate_secret to change it). active: true re-enables a disabled endpoint, clears its failure streak and returns `replay`: the call that re-sends what it missed. Accepts `metadata` (replaces the provisioning tags).\n**Required scope:** `webhooks:write`\n\n`PATCH /v1/webhook_endpoints/{id}`"
+                "description": "Update any endpoint setting in place; the signing secret is preserved (use rotate_secret to change it). active: true re-enables a disabled endpoint, clears its failure streak and returns `replay`: the call that re-sends what it missed. Accepts `metadata` (replaces the provisioning tags). ?dry_run=true changes nothing and answers would_return (the endpoint exactly as this PATCH would leave it, e.g. active: false) and changes [{section, before, after}], the same shape as every other dry run.\n**Required scope:** `webhooks:write`\n\n`PATCH /v1/webhook_endpoints/{id}`"
               },
               "response": []
             },
@@ -49112,7 +49739,7 @@
                     }
                   ]
                 },
-                "description": "Send a synthetic webhook.test event to this endpoint only (never fanned out), also when the endpoint is switched off (active: false). It is signed exactly like a real delivery, with the endpoint's own signing secret (both secrets during a rotation overlap). Two answers, by status: without ?wait the delivery is queued for the worker and the answer is 201 Created (object webhook_delivery: id, event_id, url, status pending); with ?wait=10s the attempt is made now and the answer is 200 OK with the result (object webhook_test_result): delivery_id, event_id, event_type (webhook.test), url (the exact URL tried), status (success | failed), http_status, latency_ms, response_snippet (first 1 KB of the response), error (the delivery-log code), error_kind (non_2xx, redirect, timeout, tls, dns, connection_refused, network, url_blocked; null on success), signature_header_sent and will_retry. A failed attempt is still 200: read status. Check for 2xx, not for 200.\n**Required scope:** `webhooks:write`\n\n`POST /v1/webhook_endpoints/{id}/test`"
+                "description": "Send a synthetic webhook.test event to this endpoint only (never fanned out), also when the endpoint is switched off (active: false). It is signed exactly like a real delivery, with the endpoint's own signing secret (both secrets during a rotation overlap). Two answers, by status: without ?wait the delivery is queued for the worker and the answer is 201 Created (object webhook_delivery: id, event_id, url, status pending); with ?wait=10s the attempt is made now and the answer is 200 OK with the result (object webhook_test_result): delivery_id, event_id, event_type (webhook.test), url (the exact URL tried), status (success | failed), http_status, latency_ms, response_snippet (first 1 KB of the response), error (the delivery-log code), error_kind (non_2xx, redirect, timeout, tls, dns, connection_refused, network, url_blocked; null on success), signature_header_sent and will_retry. A failed attempt is still 200: read status. Check for 2xx, not for 200. Both answers carry the shared test-call fields ok, status, http_status and latency_ms (the same four a hook test returns); while queued, ok, http_status and latency_ms are null.\n**Required scope:** `webhooks:write`\n\n`POST /v1/webhook_endpoints/{id}/test`"
               },
               "response": []
             },
@@ -63843,7 +64470,7 @@
                     }
                   ]
                 },
-                "description": "Verification-link target (accountUx.emailVerification \"link\" or \"both\"). Proves the address and completes the attempt; signs in no one here — the tab that signed up collects the session by polling. Answers a small HTML page to a browser, JSON otherwise; 400 for an invalid or expired link.\n\n`GET /v1/client/sign_ups/verify`"
+                "description": "Verification-link target (accountUx.emailVerification \"link\" or \"both\"). Proves the address and completes the attempt; signs in no one here — the tab that signed up collects the session by polling, or, where the address already had an account, is told to sign in. In that case only this page says so, with a reset link (`reset_url`). Answers a small HTML page to a browser, JSON otherwise; 400 for an invalid or expired link.\n\n`GET /v1/client/sign_ups/verify`"
               },
               "response": []
             },
@@ -68962,7 +69589,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/v1/platform/atlas_id_apps?limit=0&starting_after=string",
+                  "raw": "{{baseUrl}}/v1/platform/atlas_id_apps?include_health=true&limit=0&starting_after=string",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -68972,6 +69599,12 @@
                     "atlas_id_apps"
                   ],
                   "query": [
+                    {
+                      "key": "include_health",
+                      "value": "true",
+                      "disabled": true,
+                      "description": "false: leave out each app's `health`."
+                    },
                     {
                       "key": "limit",
                       "value": "0",
@@ -68986,7 +69619,7 @@
                     }
                   ]
                 },
-                "description": "List the Sign in with Atlas apps registered to this platform's account, with the issuer and discovery URL. Never returns a secret. Filter with ?metadata[key]=value; each item carries `metadata` and `external_ref`.\n**Required scope:** `platform:atlas_id_apps:read`\n\n`GET /v1/platform/atlas_id_apps`"
+                "description": "List the Sign in with Atlas apps registered to this platform's account, with the issuer and discovery URL. Never returns a secret. Filter with ?metadata[key]=value; each item carries `metadata` and `external_ref`, and `health`: `{ status: ok | warning | error, findings: [{ code, severity }] }` from the app preflight without its network checks (no homepage fetch; GET …/{id}/preflight has the full report). ?include_health=false leaves it out.\n**Required scope:** `platform:atlas_id_apps:read`\n\n`GET /v1/platform/atlas_id_apps`"
               },
               "response": []
             },
@@ -69050,7 +69683,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"string\",\n  \"redirect_uris\": [\n    \"string\"\n  ],\n  \"post_logout_redirect_uris\": [\n    \"string\"\n  ],\n  \"backchannel_logout_uri\": \"string\",\n  \"backchannel_logout_session_required\": false,\n  \"frontchannel_logout_uri\": \"string\",\n  \"frontchannel_logout_session_required\": false,\n  \"logo_url\": \"string\",\n  \"homepage_url\": \"string\",\n  \"allowed_scopes\": [\n    \"string\"\n  ],\n  \"branding\": {\n    \"theme\": \"auto\",\n    \"accent_color\": \"string\",\n    \"background_color\": \"string\",\n    \"privacy_policy_url\": \"string\",\n    \"terms_of_service_url\": \"string\",\n    \"design\": {\n      \"version\": \"string\",\n      \"preset\": \"minimal\",\n      \"colorScheme\": \"auto\",\n      \"palette\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"paletteDark\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"typography\": {\n        \"font\": \"string\",\n        \"headingFont\": \"string\",\n        \"baseSize\": 0,\n        \"headingWeight\": 0,\n        \"bodyWeight\": 0,\n        \"letterCase\": \"none\",\n        \"scale\": \"minor-second\"\n      },\n      \"shape\": {\n        \"radius\": 0,\n        \"controlRadius\": 0,\n        \"borderWidth\": 0\n      },\n      \"elevation\": {\n        \"cardShadow\": \"none\"\n      },\n      \"spacing\": {\n        \"density\": \"compact\"\n      },\n      \"card\": {\n        \"style\": \"solid\",\n        \"blur\": 0,\n        \"width\": \"narrow\"\n      },\n      \"layout\": {\n        \"position\": \"center\",\n        \"splitImageSide\": \"left\",\n        \"logoPlacement\": \"card\",\n        \"logoSize\": \"sm\"\n      },\n      \"buttons\": {\n        \"style\": \"solid\",\n        \"socialLayout\": \"list\"\n      },\n      \"inputs\": {\n        \"style\": \"outline\"\n      },\n      \"background\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"backgroundDark\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"logo\": {\n        \"assetId\": \"string\",\n        \"darkAssetId\": \"string\"\n      }\n    },\n    \"copy\": {\n      \"sign_in_title\": \"string\",\n      \"sign_in_subtitle\": \"string\",\n      \"sign_up_title\": \"string\",\n      \"sign_up_subtitle\": \"string\",\n      \"consent_message\": \"string\",\n      \"support_url\": \"string\",\n      \"support_label\": \"string\"\n    }\n  },\n  \"metadata\": {},\n  \"webhook_url\": \"string\",\n  \"provisioned_verified_domains_only\": false,\n  \"test_mode\": false\n}",
+                  "raw": "{\n  \"name\": \"string\",\n  \"redirect_uris\": [\n    \"string\"\n  ],\n  \"redirect_uri_environments\": {},\n  \"post_logout_redirect_uris\": [\n    \"string\"\n  ],\n  \"backchannel_logout_uri\": \"string\",\n  \"backchannel_logout_session_required\": false,\n  \"frontchannel_logout_uri\": \"string\",\n  \"frontchannel_logout_session_required\": false,\n  \"logo_url\": \"string\",\n  \"homepage_url\": \"string\",\n  \"allowed_scopes\": [\n    \"string\"\n  ],\n  \"branding\": {\n    \"theme\": \"auto\",\n    \"accent_color\": \"string\",\n    \"background_color\": \"string\",\n    \"privacy_policy_url\": \"string\",\n    \"terms_of_service_url\": \"string\",\n    \"design\": {\n      \"version\": \"string\",\n      \"preset\": \"minimal\",\n      \"colorScheme\": \"auto\",\n      \"palette\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"paletteDark\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"typography\": {\n        \"font\": \"string\",\n        \"headingFont\": \"string\",\n        \"baseSize\": 0,\n        \"headingWeight\": 0,\n        \"bodyWeight\": 0,\n        \"letterCase\": \"none\",\n        \"scale\": \"minor-second\"\n      },\n      \"shape\": {\n        \"radius\": 0,\n        \"controlRadius\": 0,\n        \"borderWidth\": 0\n      },\n      \"elevation\": {\n        \"cardShadow\": \"none\"\n      },\n      \"spacing\": {\n        \"density\": \"compact\"\n      },\n      \"card\": {\n        \"style\": \"solid\",\n        \"blur\": 0,\n        \"width\": \"narrow\"\n      },\n      \"layout\": {\n        \"position\": \"center\",\n        \"splitImageSide\": \"left\",\n        \"logoPlacement\": \"card\",\n        \"logoSize\": \"sm\"\n      },\n      \"buttons\": {\n        \"style\": \"solid\",\n        \"socialLayout\": \"list\"\n      },\n      \"inputs\": {\n        \"style\": \"outline\"\n      },\n      \"background\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"backgroundDark\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"logo\": {\n        \"assetId\": \"string\",\n        \"darkAssetId\": \"string\"\n      }\n    },\n    \"copy\": {\n      \"sign_in_title\": \"string\",\n      \"sign_in_subtitle\": \"string\",\n      \"sign_up_title\": \"string\",\n      \"sign_up_subtitle\": \"string\",\n      \"consent_message\": \"string\",\n      \"support_url\": \"string\",\n      \"support_label\": \"string\"\n    }\n  },\n  \"metadata\": {},\n  \"webhook_url\": \"string\",\n  \"provisioned_verified_domains_only\": false,\n  \"test_mode\": false,\n  \"test_mode_expires_at\": \"string\",\n  \"test_sign_in\": {\n    \"enabled\": false,\n    \"expires_at\": \"string\"\n  }\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -69075,7 +69708,7 @@
                     }
                   ]
                 },
-                "description": "Update a Sign in with Atlas app: name, redirect_uris, post_logout_redirect_uris ([] clears them), backchannel_logout_uri / frontchannel_logout_uri (empty or null clears) and their *_session_required flags, allowed_scopes, logo_url, homepage_url, branding (merged per field; null clears), webhook_url (per-app webhook; the first set returns webhook_secret once; null removes it). The app type cannot change. Apps managed by an instance's Sign in with Atlas toggle are 409. Accepts `metadata` (replaces the provisioning tags). `test_mode` turns on the app's test sign-in mode (fixed code 424242 for `+atlas_test` addresses on your verified domains, this app only): an opt-in risk, see the field.\n**Required scope:** `platform:atlas_id_apps:write`\n\n`PATCH /v1/platform/atlas_id_apps/{id}`"
+                "description": "Update a Sign in with Atlas app: name, redirect_uris, post_logout_redirect_uris ([] clears them), backchannel_logout_uri / frontchannel_logout_uri (empty or null clears) and their *_session_required flags, allowed_scopes, logo_url, homepage_url, branding (merged per field; null clears), webhook_url (per-app webhook; the first set returns webhook_secret once; null removes it). The app type cannot change. Apps managed by an instance's Sign in with Atlas toggle are 409. Accepts `metadata` (replaces the provisioning tags). `test_mode` turns on the app's test sign-in mode (fixed code 424242 for `+atlas_test` addresses on your verified domains, this app only): an opt-in risk, see the field. `test_mode_expires_at` (at most 90 days out) makes it turn itself off; `test_sign_in: { enabled, expires_at }` is the same setting as one object.\n**Required scope:** `platform:atlas_id_apps:write`\n\n`PATCH /v1/platform/atlas_id_apps/{id}`"
               },
               "response": []
             },
@@ -69211,7 +69844,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"string\",\n  \"redirect_uris\": [\n    \"string\"\n  ],\n  \"post_logout_redirect_uris\": [\n    \"string\"\n  ],\n  \"backchannel_logout_uri\": \"string\",\n  \"backchannel_logout_session_required\": false,\n  \"frontchannel_logout_uri\": \"string\",\n  \"frontchannel_logout_session_required\": false,\n  \"logo_url\": \"string\",\n  \"homepage_url\": \"string\",\n  \"allowed_scopes\": [\n    \"string\"\n  ],\n  \"branding\": {\n    \"theme\": \"auto\",\n    \"accent_color\": \"string\",\n    \"background_color\": \"string\",\n    \"privacy_policy_url\": \"string\",\n    \"terms_of_service_url\": \"string\",\n    \"design\": {\n      \"version\": \"string\",\n      \"preset\": \"minimal\",\n      \"colorScheme\": \"auto\",\n      \"palette\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"paletteDark\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"typography\": {\n        \"font\": \"string\",\n        \"headingFont\": \"string\",\n        \"baseSize\": 0,\n        \"headingWeight\": 0,\n        \"bodyWeight\": 0,\n        \"letterCase\": \"none\",\n        \"scale\": \"minor-second\"\n      },\n      \"shape\": {\n        \"radius\": 0,\n        \"controlRadius\": 0,\n        \"borderWidth\": 0\n      },\n      \"elevation\": {\n        \"cardShadow\": \"none\"\n      },\n      \"spacing\": {\n        \"density\": \"compact\"\n      },\n      \"card\": {\n        \"style\": \"solid\",\n        \"blur\": 0,\n        \"width\": \"narrow\"\n      },\n      \"layout\": {\n        \"position\": \"center\",\n        \"splitImageSide\": \"left\",\n        \"logoPlacement\": \"card\",\n        \"logoSize\": \"sm\"\n      },\n      \"buttons\": {\n        \"style\": \"solid\",\n        \"socialLayout\": \"list\"\n      },\n      \"inputs\": {\n        \"style\": \"outline\"\n      },\n      \"background\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"backgroundDark\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"logo\": {\n        \"assetId\": \"string\",\n        \"darkAssetId\": \"string\"\n      }\n    },\n    \"copy\": {\n      \"sign_in_title\": \"string\",\n      \"sign_in_subtitle\": \"string\",\n      \"sign_up_title\": \"string\",\n      \"sign_up_subtitle\": \"string\",\n      \"consent_message\": \"string\",\n      \"support_url\": \"string\",\n      \"support_label\": \"string\"\n    }\n  },\n  \"type\": \"confidential\",\n  \"metadata\": {},\n  \"external_ref\": \"string\"\n}",
+                  "raw": "{\n  \"name\": \"string\",\n  \"redirect_uris\": [\n    \"string\"\n  ],\n  \"redirect_uri_environments\": {},\n  \"post_logout_redirect_uris\": [\n    \"string\"\n  ],\n  \"backchannel_logout_uri\": \"string\",\n  \"backchannel_logout_session_required\": false,\n  \"frontchannel_logout_uri\": \"string\",\n  \"frontchannel_logout_session_required\": false,\n  \"logo_url\": \"string\",\n  \"homepage_url\": \"string\",\n  \"allowed_scopes\": [\n    \"string\"\n  ],\n  \"branding\": {\n    \"theme\": \"auto\",\n    \"accent_color\": \"string\",\n    \"background_color\": \"string\",\n    \"privacy_policy_url\": \"string\",\n    \"terms_of_service_url\": \"string\",\n    \"design\": {\n      \"version\": \"string\",\n      \"preset\": \"minimal\",\n      \"colorScheme\": \"auto\",\n      \"palette\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"paletteDark\": {\n        \"primary\": \"string\",\n        \"primaryInk\": \"string\",\n        \"accent\": \"string\",\n        \"background\": \"string\",\n        \"surface\": \"string\",\n        \"text\": \"string\",\n        \"muted\": \"string\",\n        \"border\": \"string\",\n        \"danger\": \"string\",\n        \"success\": \"string\",\n        \"inputBackground\": \"string\",\n        \"inputText\": \"string\"\n      },\n      \"typography\": {\n        \"font\": \"string\",\n        \"headingFont\": \"string\",\n        \"baseSize\": 0,\n        \"headingWeight\": 0,\n        \"bodyWeight\": 0,\n        \"letterCase\": \"none\",\n        \"scale\": \"minor-second\"\n      },\n      \"shape\": {\n        \"radius\": 0,\n        \"controlRadius\": 0,\n        \"borderWidth\": 0\n      },\n      \"elevation\": {\n        \"cardShadow\": \"none\"\n      },\n      \"spacing\": {\n        \"density\": \"compact\"\n      },\n      \"card\": {\n        \"style\": \"solid\",\n        \"blur\": 0,\n        \"width\": \"narrow\"\n      },\n      \"layout\": {\n        \"position\": \"center\",\n        \"splitImageSide\": \"left\",\n        \"logoPlacement\": \"card\",\n        \"logoSize\": \"sm\"\n      },\n      \"buttons\": {\n        \"style\": \"solid\",\n        \"socialLayout\": \"list\"\n      },\n      \"inputs\": {\n        \"style\": \"outline\"\n      },\n      \"background\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"backgroundDark\": {\n        \"color\": \"string\",\n        \"gradient\": {\n          \"type\": null,\n          \"angle\": null,\n          \"stops\": null\n        },\n        \"image\": {\n          \"assetId\": null,\n          \"fit\": null,\n          \"position\": null,\n          \"overlay\": null,\n          \"blur\": null\n        },\n        \"pattern\": \"none\"\n      },\n      \"logo\": {\n        \"assetId\": \"string\",\n        \"darkAssetId\": \"string\"\n      }\n    },\n    \"copy\": {\n      \"sign_in_title\": \"string\",\n      \"sign_in_subtitle\": \"string\",\n      \"sign_up_title\": \"string\",\n      \"sign_up_subtitle\": \"string\",\n      \"consent_message\": \"string\",\n      \"support_url\": \"string\",\n      \"support_label\": \"string\"\n    }\n  },\n  \"type\": \"confidential\",\n  \"metadata\": {},\n  \"external_ref\": \"string\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -69478,12 +70111,12 @@
                     "atlas_id_publisher"
                   ]
                 },
-                "description": "The account's Sign in with Atlas publisher: name, domain, whether it is verified, the DNS TXT record to publish, and skip_consent. Until one is claimed: 200 `{ object: \"atlas_id_publisher\", configured: false }` (not a 404).\n**Required scope:** `platform:atlas_id_apps:read`\n\n`GET /v1/platform/atlas_id_publisher`"
+                "description": "The account's Sign in with Atlas publisher: name, domain, whether it is verified, the DNS TXT record to publish, and skip_consent, plus the account-wide default_privacy_policy_url and default_terms_of_service_url. Until one is claimed: 200 `{ object: \"atlas_id_publisher\", configured: false }` with the two defaults (not a 404).\n**Required scope:** `platform:atlas_id_apps:read`\n\n`GET /v1/platform/atlas_id_publisher`"
               },
               "response": []
             },
             {
-              "name": "PATCH Turn publisher-wide consent (skip_consent) on or off. Off by default; applies only to verified apps and only to op",
+              "name": "PATCH Turn publisher-wide consent (skip_consent) on or off (off by default; applies only to verified apps and only to op",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -69494,7 +70127,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"skip_consent\": false\n}",
+                  "raw": "{\n  \"skip_consent\": false,\n  \"default_privacy_policy_url\": \"string\",\n  \"default_terms_of_service_url\": \"string\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -69512,7 +70145,7 @@
                     "atlas_id_publisher"
                   ]
                 },
-                "description": "Turn publisher-wide consent (skip_consent) on or off. Off by default; applies only to verified apps and only to openid / email / profile.\n**Required scope:** `platform:atlas_id_apps:write`\n\n`PATCH /v1/platform/atlas_id_publisher`"
+                "description": "Turn publisher-wide consent (skip_consent) on or off (off by default; applies only to verified apps and only to openid / email / profile), and set the account-wide default legal links (default_privacy_policy_url, default_terms_of_service_url; https, null clears) that every app without its own privacy_policy_url / terms_of_service_url shows. The defaults work without a publisher claim; skip_consent needs one (404).\n**Required scope:** `platform:atlas_id_apps:write`\n\n`PATCH /v1/platform/atlas_id_publisher`"
               },
               "response": []
             },
@@ -73091,7 +73724,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"machine_id\": \"string\",\n  \"nonce\": \"string\",\n  \"signature\": \"string\"\n}",
+                  "raw": "{\n  \"machine_id\": \"string\",\n  \"nonce\": \"string\",\n  \"signature\": \"string\",\n  \"audience\": \"string\",\n  \"scopes\": [\n    \"string\"\n  ],\n  \"scope_presets\": [\n    \"string\"\n  ],\n  \"organization_id\": \"string\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -75330,6 +75963,70 @@
                   ]
                 },
                 "description": "The advisories for one package (react, or URL-encoded @atlasauth/react).\n\n`GET /v1/sdk_advisories/{package}`"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "sign-in-with-atlas",
+          "item": [
+            {
+              "name": "GET The Atlas mark the button draws, as an SVG file (fill is currentColor). Public, cached for 1 hour.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/sign-in-with-atlas/kit/atlas-mark.svg",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "sign-in-with-atlas",
+                    "kit",
+                    "atlas-mark.svg"
+                  ]
+                },
+                "description": "The Atlas mark the button draws, as an SVG file (fill is currentColor). Public, cached for 1 hour.\n\n`GET /sign-in-with-atlas/kit/atlas-mark.svg`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET The kit stylesheet: .atlas-signin-btn with the modifiers --filled-dark, --filled-light, --outline and --icon (square",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/sign-in-with-atlas/kit/button.css",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "sign-in-with-atlas",
+                    "kit",
+                    "button.css"
+                  ]
+                },
+                "description": "The kit stylesheet: .atlas-signin-btn with the modifiers --filled-dark, --filled-light, --outline and --icon (square, mark only), themed by the --atlas-host-* CSS variables, with a visible focus ring. Public, cached for 1 hour.\n\n`GET /sign-in-with-atlas/kit/button.css`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET The no-script \"Sign in with Atlas\" button kit: the mark and stylesheet URLs, the authorize-link template (with atlas",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/sign-in-with-atlas/kit.json",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "sign-in-with-atlas",
+                    "kit.json"
+                  ]
+                },
+                "description": "The no-script \"Sign in with Atlas\" button kit: the mark and stylesheet URLs, the authorize-link template (with atlasid_fallback=1, so its sign-ins count as no-script sign-ins) and one ready <a> snippet per variant (filled-dark, filled-light, outline, icon). For a site that renders its own button without the script; theme it with the --atlas-host-bg / -fg / -border / -radius / -font / -height CSS variables. Public, CORS *, cached for 1 hour.\n\n`GET /sign-in-with-atlas/kit.json`"
               },
               "response": []
             }
