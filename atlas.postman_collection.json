@@ -61654,7 +61654,7 @@
               "response": []
             },
             {
-              "name": "GET Reset-link target. Proves the inbox and advances the attempt (to the second factor or the new password) like a corre",
+              "name": "GET Reset-link target. Spends nothing and completes nothing, so a mail scanner opening it does no harm: answers `{ requi",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -61684,7 +61684,43 @@
                     }
                   ]
                 },
-                "description": "Reset-link target. Proves the inbox and advances the attempt (to the second factor or the new password) like a correct code; the tab that asked continues by polling. Answers a small HTML page to a browser, JSON otherwise; 400 for an invalid or expired link.\n\n`GET /v1/client/password_resets/verify`"
+                "description": "Reset-link target. Spends nothing and completes nothing, so a mail scanner opening it does no harm: answers `{ requires_confirmation: true }` for a live link, and never the match code. A browser gets a page that confirms with POST /v1/client/password_resets/verify/confirm. A link minted with POST /v1/users/{id}/links has no starting tab, so it needs no confirmation: opening it proves the inbox and advances the attempt. 400 for every kind of invalid or expired link.\n\n`GET /v1/client/password_resets/verify`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Confirm an emailed link from the page it opens, with exactly one proof of a tie to the tab that started the reset: ",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"attempt\": \"string\",\n  \"token\": \"string\",\n  \"match_code\": \"string\",\n  \"poll_secret\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/client/password_resets/verify/confirm",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "client",
+                    "password_resets",
+                    "verify",
+                    "confirm"
+                  ]
+                },
+                "description": "Confirm an emailed link from the page it opens, with exactly one proof of a tie to the tab that started the reset: `poll_secret` (same browser) or the typed `match_code` that tab shows. Completes what that tab is polling and returns nothing to sign in with. One use. A wrong code invalidates the link; a wrong poll_secret does not, so the page can fall back to typing. The same 400 for every failure. Limited with the credential-check budget.\n\n`POST /v1/client/password_resets/verify/confirm`"
               },
               "response": []
             },
@@ -63211,7 +63247,7 @@
           "name": "sign_ins",
           "item": [
             {
-              "name": "GET Magic-link target. Completes the attempt; signs in no one here.",
+              "name": "GET Magic-link target. Spends nothing and completes nothing, so a mail scanner opening it does no harm: answers `{ requi",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -63241,7 +63277,7 @@
                     }
                   ]
                 },
-                "description": "Magic-link target. Completes the attempt; signs in no one here.\n\n`GET /v1/client/sign_ins/verify`"
+                "description": "Magic-link target. Spends nothing and completes nothing, so a mail scanner opening it does no harm: answers `{ requires_confirmation: true }` for a live link, and never the match code. A browser gets a page that confirms with POST /v1/client/sign_ins/verify/confirm. 400 for every kind of invalid or expired link.\n\n`GET /v1/client/sign_ins/verify`"
               },
               "response": []
             },
@@ -63576,6 +63612,42 @@
               "response": []
             },
             {
+              "name": "POST Confirm an emailed link from the page it opens, with exactly one proof of a tie to the tab that started the sign-in",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"token\": \"string\",\n  \"attempt\": \"string\",\n  \"match_code\": \"string\",\n  \"poll_secret\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/client/sign_ins/verify/confirm",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "client",
+                    "sign_ins",
+                    "verify",
+                    "confirm"
+                  ]
+                },
+                "description": "Confirm an emailed link from the page it opens, with exactly one proof of a tie to the tab that started the sign-in: `poll_secret` (same browser) or the typed `match_code` that tab shows. Completes what that tab is polling and returns nothing to sign in with. One use. A wrong code invalidates the link; a wrong poll_secret does not, so the page can fall back to typing. The same 400 for every failure. Limited with the credential-check budget.\n\n`POST /v1/client/sign_ins/verify/confirm`"
+              },
+              "response": []
+            },
+            {
               "name": "POST Confirm the factor started by prepare_mfa_enrollment and complete the sign-in: `codes` from the authenticator app (",
               "request": {
                 "method": "POST",
@@ -63587,7 +63659,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"strategy\": \"string\",\n  \"factor_id\": \"string\",\n  \"codes\": [\n    \"string\"\n  ],\n  \"code\": \"string\",\n  \"otp\": \"string\"\n}",
+                  "raw": "{\n  \"strategy\": \"string\",\n  \"factor_id\": \"string\",\n  \"codes\": [\n    \"string\"\n  ],\n  \"code\": \"string\",\n  \"otp\": \"string\",\n  \"challenge\": \"string\",\n  \"attestation_object\": \"string\",\n  \"client_data_json\": \"string\",\n  \"name\": \"string\",\n  \"transports\": [\n    \"string\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -63613,7 +63685,7 @@
                     }
                   ]
                 },
-                "description": "Confirm the factor started by prepare_mfa_enrollment and complete the sign-in: `codes` from the authenticator app (one, or two consecutive when the application asks for two), the texted `code`, `strategy: \"hotp\"` with the token's `code`, `strategy: \"yubikey\"` with a touched `otp` (no prepare step), or `strategy: \"duo\"` once the Duo prompt was approved (400 until then). Returns the recovery codes once (`backup_codes`) and the one-time ticket to exchange for the session.\n\n`POST /v1/client/sign_ins/{id}/attempt_mfa_enrollment`"
+                "description": "Confirm the factor started by prepare_mfa_enrollment and complete the sign-in: `codes` from the authenticator app (one, or two consecutive when the application asks for two), the texted `code`, `strategy: \"hotp\"` with the token's `code`, `strategy: \"yubikey\"` with a touched `otp` (no prepare step), `strategy: \"duo\"` once the Duo prompt was approved (400 until then), or `strategy: \"passkey\"` with the `challenge`, `attestation_object` and `client_data_json` of the new passkey (a passkey that proved presence without a PIN or biometric is refused, 400 with reason `passkey_not_user_verified`, and not stored). Returns the recovery codes once (`backup_codes`) and the one-time ticket to exchange for the session.\n\n`POST /v1/client/sign_ins/{id}/attempt_mfa_enrollment`"
               },
               "response": []
             },
@@ -63656,42 +63728,6 @@
                   ]
                 },
                 "description": "Continue an attempt held at needs_policy_acceptance (any sign-in method, a social or SSO sign-up, a passkey): accept every pending policy, then the attempt completes (with the one-time ticket) or continues. Prove the attempt with the policy_acceptance_token from the response (or redirect: __atlas_policy_token) that put it there, or with the attempt poll_secret. 422 POLICY_ACCEPTANCE_REQUIRED (meta.policies) when a pending policy is missing, stale, does not match its hash, or a scroll policy lacks scrolled_to_end; 404 for an unknown attempt or a wrong token; 409 when the attempt is not waiting on policies.\n\n`POST /v1/client/sign_ins/{id}/accept_policies`"
-              },
-              "response": []
-            },
-            {
-              "name": "POST Cross-device magic link, second device: confirm the sign-in the link was emailed for by repeating the 4-digit code ",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"token\": \"string\",\n  \"attempt\": \"string\",\n  \"match_code\": \"string\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/v1/client/sign_ins/verify/confirm",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "v1",
-                    "client",
-                    "sign_ins",
-                    "verify",
-                    "confirm"
-                  ]
-                },
-                "description": "Cross-device magic link, second device: confirm the sign-in the link was emailed for by repeating the 4-digit code both devices show. Completes the attempt the first device is polling. One use; a wrong code invalidates the link. Start it with prepare_first_factor `strategy: \"email_link\", cross_device: true` (the response carries `match_code`) and open the emailed link with `cross_device=1`, which only previews and returns the code.\n\n`POST /v1/client/sign_ins/verify/confirm`"
               },
               "response": []
             },
@@ -63984,7 +64020,7 @@
               "response": []
             },
             {
-              "name": "POST Send an email code or magic link. Returns the polling secret to this tab. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED",
+              "name": "POST Send an email code or magic link. Returns the polling secret to this tab, and for a link the `match_code` to show h",
               "request": {
                 "method": "POST",
                 "header": [
@@ -64021,7 +64057,7 @@
                     }
                   ]
                 },
-                "description": "Send an email code or magic link. Returns the polling secret to this tab. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email.\n\n`POST /v1/client/sign_ins/{id}/prepare_first_factor`"
+                "description": "Send an email code or magic link. Returns the polling secret to this tab, and for a link the `match_code` to show here and nowhere else: a link on another device asks for it. `cross_device` is still accepted and changes nothing. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email.\n\n`POST /v1/client/sign_ins/{id}/prepare_first_factor`"
               },
               "response": []
             },
@@ -64275,7 +64311,7 @@
                     }
                   ]
                 },
-                "description": "Start enrolling a second factor for an attempt that owes MFA enrolment (needs_mfa_enrollment). Default `strategy: \"totp\"`: returns the setup key, the otpauth URI and its QR image (`qr_code`, a data: URL), shown once. `strategy: \"phone_code\"` with `phone` (E.164): texts a code to that number, where the application offers the SMS second factor and can send texts (422 STRATEGY_DISABLED / 409 otherwise); call again to resend. `strategy: \"hotp\"` returns a counter-token setup key and QR like totp; `strategy: \"duo\"` returns the `authorization_url` to send the user to (422 STRATEGY_DISABLED when the application does not offer the factor).\n\n`POST /v1/client/sign_ins/{id}/prepare_mfa_enrollment`"
+                "description": "Start enrolling a second factor for an attempt that owes MFA enrolment (needs_mfa_enrollment). Default `strategy: \"totp\"`: returns the setup key, the otpauth URI and its QR image (`qr_code`, a data: URL), shown once. `strategy: \"phone_code\"` with `phone` (E.164): texts a code to that number, where the application offers the SMS second factor and can send texts (422 STRATEGY_DISABLED / 409 otherwise); call again to resend. `strategy: \"hotp\"` returns a counter-token setup key and QR like totp; `strategy: \"duo\"` returns the `authorization_url` to send the user to; `strategy: \"passkey\"` returns `options` for `navigator.credentials.create`, with no `factor_id` (422 STRATEGY_DISABLED when the application does not offer the factor).\n\n`POST /v1/client/sign_ins/{id}/prepare_mfa_enrollment`"
               },
               "response": []
             },
@@ -64405,7 +64441,7 @@
           "name": "sign_ups",
           "item": [
             {
-              "name": "GET Poll a sign-up attempt with its poll_secret (link mode); returns a ticket once complete.",
+              "name": "GET Poll a sign-up attempt with its poll_secret (link mode); returns a ticket once complete. A repeat sign-up that waite",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -64435,12 +64471,12 @@
                     }
                   ]
                 },
-                "description": "Poll a sign-up attempt with its poll_secret (link mode); returns a ticket once complete.\n\n`GET /v1/client/sign_ups/{id}`"
+                "description": "Poll a sign-up attempt with its poll_secret (link mode); returns a ticket once complete. A repeat sign-up that waited on an earlier attempt's link reports `finished_elsewhere: true` once that attempt has made the account, with no ticket: the person signs in.\n\n`GET /v1/client/sign_ups/{id}`"
               },
               "response": []
             },
             {
-              "name": "GET Verification-link target (accountUx.emailVerification \"link\" or \"both\"). Proves the address, creates the account and",
+              "name": "GET Verification-link target (accountUx.emailVerification \"link\" or \"both\"). Spends nothing and completes nothing, so a ",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -64470,7 +64506,7 @@
                     }
                   ]
                 },
-                "description": "Verification-link target (accountUx.emailVerification \"link\" or \"both\"). Proves the address, creates the account and completes the attempt (or moves it to the step it owes); signs in no one here — the tab that signed up collects the session by polling, or, where the address already had an account, is told to sign in. In that case only this page says so, with a reset link (`reset_url`). Answers a small HTML page to a browser, JSON otherwise; 400 for an invalid or expired link.\n\n`GET /v1/client/sign_ups/verify`"
+                "description": "Verification-link target (accountUx.emailVerification \"link\" or \"both\"). Spends nothing and completes nothing, so a mail scanner opening it does no harm: answers `{ requires_confirmation: true }` for a live link, and never the match code. A browser gets a page that confirms with POST /v1/client/sign_ups/verify/confirm. 400 for every kind of invalid or expired link.\n\n`GET /v1/client/sign_ups/verify`"
               },
               "response": []
             },
@@ -64513,6 +64549,42 @@
                   ]
                 },
                 "description": "Check a sign-up email verification code without using it up. Answers 200 with `valid: true` for a right, live code (the code is NOT used up — the attempt endpoint still redeems it once); 400 VERIFICATION_FAILED for a wrong, expired or unknown code (one message for all, so it is not an oracle); 429 TOO_MANY_ATTEMPTS once the code is locked. A wrong code spends one of the code’s attempts exactly like the attempt endpoint, so checking is no way around the lockout. Rate-limited with the credential-verify budget.\n\n`POST /v1/client/sign_ups/{id}/check_verification`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Confirm an emailed link from the page it opens, with exactly one proof of a tie to the tab that started the sign-up",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"attempt\": \"string\",\n  \"token\": \"string\",\n  \"match_code\": \"string\",\n  \"poll_secret\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/client/sign_ups/verify/confirm",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "client",
+                    "sign_ups",
+                    "verify",
+                    "confirm"
+                  ]
+                },
+                "description": "Confirm an emailed link from the page it opens, with exactly one proof of a tie to the tab that started the sign-up: `poll_secret` (same browser) or the typed `match_code` that tab shows. Completes what that tab is polling and returns nothing to sign in with. One use. A wrong code invalidates the link; a wrong poll_secret does not, so the page can fall back to typing. The same 400 for every failure. Limited with the credential-check budget.\n\n`POST /v1/client/sign_ups/verify/confirm`"
               },
               "response": []
             },
@@ -64560,7 +64632,7 @@
               "response": []
             },
             {
-              "name": "POST Reissue a verification code. Rate limited to 1/30s and 5/hour per address and source, and 4 times that hourly limit",
+              "name": "POST Reissue a verification code or link. A new link answers with new `poll_secret` and `match_code`, and the old secret",
               "request": {
                 "method": "POST",
                 "header": [
@@ -64597,7 +64669,7 @@
                     }
                   ]
                 },
-                "description": "Reissue a verification code. Rate limited to 1/30s and 5/hour per address and source, and 4 times that hourly limit per address overall. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email.\n\n`POST /v1/client/sign_ups/{id}/prepare_verification`"
+                "description": "Reissue a verification code or link. A new link answers with new `poll_secret` and `match_code`, and the old secret stops polling. Rate limited to 1/30s and 5/hour per address and source, and 4 times that hourly limit per address overall. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email.\n\n`POST /v1/client/sign_ups/{id}/prepare_verification`"
               },
               "response": []
             },
@@ -73625,7 +73697,7 @@
                     "launch"
                   ]
                 },
-                "description": "LTI 1.3 launch callback. Verifies the platform id_token (JWKS signature, iss, aud=client_id, single-use nonce), enforces the deployment_id allowlist and LtiResourceLinkRequest/1.3.0, JITs the user, and lands them on target_link_uri with SameSite=None session cookies for the LMS iframe.\n\n`POST /lti/launch`"
+                "description": "LTI 1.3 launch callback. Verifies the platform id_token (JWKS signature, iss, aud=client_id, single-use nonce), enforces the deployment_id allowlist and LtiResourceLinkRequest/1.3.0, JITs the user, and lands them on target_link_uri with SameSite=None session cookies for the LMS iframe. A user who owes a second factor (one they hold, or enrolment under mfaPolicy required) gets no session here: the answer is a page for the frame, linking to the hosted step in a new window, and the tool opens there once it is done.\n\n`POST /lti/launch`"
               },
               "response": []
             },
