@@ -52483,7 +52483,7 @@
           "name": "email_addresses",
           "item": [
             {
-              "name": "GET Target of an admin-generated email-verification link. Consumes the single-use token, proves the address and answers ",
+              "name": "GET Target of an admin-generated email-verification link. Opening it spends nothing, so a mail scanner cannot burn it: a",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -52513,7 +52513,43 @@
                     }
                   ]
                 },
-                "description": "Target of an admin-generated email-verification link. Consumes the single-use token, proves the address and answers a small HTML page to a browser, JSON otherwise; it signs nobody in. 400 for an invalid or expired link.\n\n`GET /v1/client/email_addresses/verify`"
+                "description": "Target of an admin-generated email-verification link. Opening it spends nothing, so a mail scanner cannot burn it: a browser gets a page with a button, anything else `{ requires_confirmation: true }`. `POST /v1/client/email_addresses/verify/confirm` consumes the single-use token and proves the address; it signs nobody in. 400 for an invalid or expired link.\n\n`GET /v1/client/email_addresses/verify`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Confirm an admin-generated email-verification link from the page it opens: consumes the single-use token and proves",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"string\",\n  \"token\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/client/email_addresses/verify/confirm",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "client",
+                    "email_addresses",
+                    "verify",
+                    "confirm"
+                  ]
+                },
+                "description": "Confirm an admin-generated email-verification link from the page it opens: consumes the single-use token and proves the address. Signs nobody in. Answers a small page to a browser, JSON otherwise.\n\n`POST /v1/client/email_addresses/verify/confirm`"
               },
               "response": []
             }
@@ -62346,7 +62382,7 @@
           "name": "qr_sign_ins",
           "item": [
             {
-              "name": "GET Phone lookup for a pending QR sign-in: the requesting browser’s device + coarse location and the match code to confi",
+              "name": "GET Phone lookup for a pending QR sign-in: the requesting browser’s device + coarse location, never the match code: the ",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -62368,12 +62404,12 @@
                     }
                   ]
                 },
-                "description": "Phone lookup for a pending QR sign-in: the requesting browser’s device + coarse location and the match code to confirm. Requires the phone’s session.\n\n`GET /v1/client/qr_sign_ins/{qr_token}`"
+                "description": "Phone lookup for a pending QR sign-in: the requesting browser’s device + coarse location, never the match code: the person types that from the browser. Requires the phone’s session.\n\n`GET /v1/client/qr_sign_ins/{qr_token}`"
               },
               "response": []
             },
             {
-              "name": "POST Phone approves a pending QR sign-in after confirming the number-match code; completes the attempt so the browser’s ",
+              "name": "POST Phone approves a pending QR sign-in with the number-match code the person typed from the browser; completes the att",
               "request": {
                 "method": "POST",
                 "header": [
@@ -62410,7 +62446,7 @@
                     }
                   ]
                 },
-                "description": "Phone approves a pending QR sign-in after confirming the number-match code; completes the attempt so the browser’s poll mints a session. Requires the phone’s session.\n\n`POST /v1/client/qr_sign_ins/{qr_token}/approve`"
+                "description": "Phone approves a pending QR sign-in with the number-match code the person typed from the browser; completes the attempt so the browser’s poll mints a session. Requires the phone’s session.\n\n`POST /v1/client/qr_sign_ins/{qr_token}/approve`"
               },
               "response": []
             },
@@ -63313,6 +63349,34 @@
                   ]
                 },
                 "description": "Poll an attempt with its poll_secret; returns a ticket once complete.\n\n`GET /v1/client/sign_ins/{id}`"
+              },
+              "response": []
+            },
+            {
+              "name": "GET The kinds of second factor this account holds (`totp`, `sms`, `passkey`, and so on), once the attempt has passed its",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/client/sign_ins/:id/second_factors",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "client",
+                    "sign_ins",
+                    ":id",
+                    "second_factors"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "id"
+                    }
+                  ]
+                },
+                "description": "The kinds of second factor this account holds (`totp`, `sms`, `passkey`, and so on), once the attempt has passed its first factor, so a custom UI offers only what can work.\n\n`GET /v1/client/sign_ins/{id}/second_factors`"
               },
               "response": []
             },
@@ -65083,7 +65147,42 @@
                     }
                   ]
                 },
-                "description": "Target of the lockout recovery link mailed when the instance uses `attackProtection.bruteForce.unblock: \"email_link\"`. Consumes the single-use token and clears the account's lock; answers a small HTML page to a browser, JSON otherwise. 400 for an invalid, used or expired link.\n\n`GET /v1/client/unblock`"
+                "description": "Target of the lockout recovery link mailed when the instance uses `attackProtection.bruteForce.unblock: \"email_link\"`. Opening it spends nothing, so a mail scanner cannot burn it: a browser gets a page with a button, anything else `{ requires_confirmation: true }`. `POST /v1/client/unblock/confirm` consumes the single-use token and clears the account's lock; answers a small HTML page to a browser, JSON otherwise. 400 for an invalid, used or expired link.\n\n`GET /v1/client/unblock`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Confirm a lockout recovery link from the page it opens: consumes the single-use token and clears the lock. Answers ",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"token\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/client/unblock/confirm",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "client",
+                    "unblock",
+                    "confirm"
+                  ]
+                },
+                "description": "Confirm a lockout recovery link from the page it opens: consumes the single-use token and clears the lock. Answers a small page to a browser, JSON otherwise.\n\n`POST /v1/client/unblock/confirm`"
               },
               "response": []
             }
@@ -72714,6 +72813,33 @@
               "response": []
             },
             {
+              "name": "GET The page a QR sign-in code opens on the signed-in phone: shows who is asking and takes the code the other screen sho",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/hosted/qr_sign_in?qr_token=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "hosted",
+                    "qr_sign_in"
+                  ],
+                  "query": [
+                    {
+                      "key": "qr_token",
+                      "value": "string",
+                      "disabled": false,
+                      "description": "The token from the QR code. Required."
+                    }
+                  ]
+                },
+                "description": "The page a QR sign-in code opens on the signed-in phone: shows who is asking and takes the code the other screen shows. Signed out goes to hosted sign-in and back.\n\n`GET /hosted/qr_sign_in`"
+              },
+              "response": []
+            },
+            {
               "name": "POST Admin Portal: add a log stream for the ticket-bound organization (only when the ticket grants the log_stream intent",
               "request": {
                 "method": "POST",
@@ -72951,6 +73077,29 @@
                   ]
                 },
                 "description": "Admin Portal: revoke one of the organization's API keys.\n\n`POST /hosted/sso-setup/api-keys/revoke`"
+              },
+              "response": []
+            },
+            {
+              "name": "POST Approve or deny a QR sign-in from that page (urlencoded, same origin only).",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": []
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/hosted/qr_sign_in",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "hosted",
+                    "qr_sign_in"
+                  ]
+                },
+                "description": "Approve or deny a QR sign-in from that page (urlencoded, same origin only).\n\n`POST /hosted/qr_sign_in`"
               },
               "response": []
             },
