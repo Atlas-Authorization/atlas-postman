@@ -63353,7 +63353,7 @@
               "response": []
             },
             {
-              "name": "GET The kinds of second factor this account holds (`totp`, `sms`, `passkey`, and so on), once the attempt has passed its",
+              "name": "GET The kinds of second factor this account can use (`totp`, `sms`, `passkey`, and so on, plus `email_code` when the app",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -63376,7 +63376,7 @@
                     }
                   ]
                 },
-                "description": "The kinds of second factor this account holds (`totp`, `sms`, `passkey`, and so on), once the attempt has passed its first factor, so a custom UI offers only what can work.\n\n`GET /v1/client/sign_ins/{id}/second_factors`"
+                "description": "The kinds of second factor this account can use (`totp`, `sms`, `passkey`, and so on, plus `email_code` when the app offers it and the account has a verified address), once the attempt has passed its first factor, so a custom UI offers only what can work.\n\n`GET /v1/client/sign_ins/{id}/second_factors`"
               },
               "response": []
             },
