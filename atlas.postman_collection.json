@@ -20271,7 +20271,7 @@
                     "instance"
                   ]
                 },
-                "description": "Read instance configuration. Returns both the raw auth_config patch and auth_config_resolved — the EFFECTIVE config with defaults expanded (enabled first factors, password policy, session, MFA), so you can inspect live auth behaviour and learn the exact shape to PATCH. Never returns the private signing key.\n**Required scope:** `instance:read`\n\n`GET /v1/instance`"
+                "description": "Read instance configuration. Returns both the raw auth_config patch and auth_config_resolved — the EFFECTIVE config with defaults expanded (enabled first factors, password policy, session, MFA), so you can inspect live auth behaviour and learn the exact shape to PATCH. Never returns the private signing key. auth_config includes sections owned by other routes (branding, design, hosted_pages and so on); they are read-only through PATCH /v1/instance unless sent back unchanged.\n**Required scope:** `instance:read`\n\n`GET /v1/instance`"
               },
               "response": []
             },
