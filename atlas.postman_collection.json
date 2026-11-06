@@ -64440,7 +64440,7 @@
               "response": []
             },
             {
-              "name": "GET Verification-link target (accountUx.emailVerification \"link\" or \"both\"). Proves the address and completes the attemp",
+              "name": "GET Verification-link target (accountUx.emailVerification \"link\" or \"both\"). Proves the address, creates the account and",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -64470,7 +64470,7 @@
                     }
                   ]
                 },
-                "description": "Verification-link target (accountUx.emailVerification \"link\" or \"both\"). Proves the address and completes the attempt; signs in no one here — the tab that signed up collects the session by polling, or, where the address already had an account, is told to sign in. In that case only this page says so, with a reset link (`reset_url`). Answers a small HTML page to a browser, JSON otherwise; 400 for an invalid or expired link.\n\n`GET /v1/client/sign_ups/verify`"
+                "description": "Verification-link target (accountUx.emailVerification \"link\" or \"both\"). Proves the address, creates the account and completes the attempt (or moves it to the step it owes); signs in no one here — the tab that signed up collects the session by polling, or, where the address already had an account, is told to sign in. In that case only this page says so, with a reset link (`reset_url`). Answers a small HTML page to a browser, JSON otherwise; 400 for an invalid or expired link.\n\n`GET /v1/client/sign_ups/verify`"
               },
               "response": []
             },
@@ -64560,7 +64560,7 @@
               "response": []
             },
             {
-              "name": "POST Reissue a verification code. Rate limited to 1/30s and 5/hour per address. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURE",
+              "name": "POST Reissue a verification code. Rate limited to 1/30s and 5/hour per address and source, and 4 times that hourly limit",
               "request": {
                 "method": "POST",
                 "header": [
@@ -64597,7 +64597,7 @@
                     }
                   ]
                 },
-                "description": "Reissue a verification code. Rate limited to 1/30s and 5/hour per address. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email.\n\n`POST /v1/client/sign_ups/{id}/prepare_verification`"
+                "description": "Reissue a verification code. Rate limited to 1/30s and 5/hour per address and source, and 4 times that hourly limit per address overall. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email.\n\n`POST /v1/client/sign_ups/{id}/prepare_verification`"
               },
               "response": []
             },
@@ -64637,7 +64637,7 @@
               "response": []
             },
             {
-              "name": "POST Start an email + password sign-up. Returns an attempt whose status drives the next step. Returns 422 EMAIL_DELIVERY",
+              "name": "POST Start an email + password sign-up. Returns an attempt whose status drives the next step. When the address has to be",
               "request": {
                 "method": "POST",
                 "header": [
@@ -64666,12 +64666,12 @@
                     "sign_ups"
                   ]
                 },
-                "description": "Start an email + password sign-up. Returns an attempt whose status drives the next step. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email. An optional `referral` (see ReferralCaptureInput) is kept on the attempt and attributes the user when it is created; it is ignored when referrals are off. An optional `username` is claimed when the application offers usernames (400 when it breaks the username rule or is required and missing, 409 IDENTIFIER_EXISTS when taken, 422 STRATEGY_DISABLED when usernames are off). Policies: `policy_acceptances` must list the current version of every required policy (422 POLICY_ACCEPTANCE_REQUIRED with meta.policies otherwise); the legacy single checkbox is `consent: true`. Acceptances are recorded once the account exists. Sign in with Atlas (the Atlas ID instance only): `redirect_url` is the page's /oauth2/authorize request and names the app the sign-up serves. When that app's owner turned on its test sign-in mode, an address with `+atlas_test` on a domain the owner verified gets the fixed code 424242 (no email) and becomes a test account that can sign in to that app only; 409 PROVISIONED_ACCOUNT_LIMIT_REACHED past the owner's test-account cap. Ignored on every other instance and for every other address.\n\n`POST /v1/client/sign_ups`"
+                "description": "Start an email + password sign-up. Returns an attempt whose status drives the next step. When the address has to be proven, no account exists until it is: the proof creates it. Returns 422 EMAIL_DELIVERY_NOT_CONFIGURED (nothing is sent or issued) when the app cannot deliver email. An optional `referral` (see ReferralCaptureInput) is kept on the attempt and attributes the user when it is created; it is ignored when referrals are off. An optional `username` is taken when the account is created, if the application offers usernames (400 when it breaks the username rule or is required and missing, 409 IDENTIFIER_EXISTS when taken, 422 STRATEGY_DISABLED when usernames are off). Policies: `policy_acceptances` must list the current version of every required policy (422 POLICY_ACCEPTANCE_REQUIRED with meta.policies otherwise); the legacy single checkbox is `consent: true`. Acceptances are recorded once the account exists. Sign in with Atlas (the Atlas ID instance only): `redirect_url` is the page's /oauth2/authorize request and names the app the sign-up serves. When that app's owner turned on its test sign-in mode, an address with `+atlas_test` on a domain the owner verified gets the fixed code 424242 (no email) and becomes a test account that can sign in to that app only; 409 PROVISIONED_ACCOUNT_LIMIT_REACHED past the owner's test-account cap. Ignored on every other instance and for every other address.\n\n`POST /v1/client/sign_ups`"
               },
               "response": []
             },
             {
-              "name": "POST Submit an email verification code. Three attempts, then the code is invalidated.",
+              "name": "POST Submit an email verification code. Three attempts, then the code is invalidated. On the right code the account is c",
               "request": {
                 "method": "POST",
                 "header": [
@@ -64708,7 +64708,7 @@
                     }
                   ]
                 },
-                "description": "Submit an email verification code. Three attempts, then the code is invalidated.\n\n`POST /v1/client/sign_ups/{id}/attempt_verification`"
+                "description": "Submit an email verification code. Three attempts, then the code is invalidated. On the right code the account is created (user.created fires now, with the address verified) and the attempt reaches complete or the step it owes: needs_mfa_enrollment, needs_second_factor, or needs_first_factor when the email second factor is the only one on offer. 409 IDENTIFIER_EXISTS, creating nothing, when the address or username was taken while the attempt waited.\n\n`POST /v1/client/sign_ups/{id}/attempt_verification`"
               },
               "response": []
             },
